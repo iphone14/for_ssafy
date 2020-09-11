@@ -150,39 +150,29 @@ def adamGD(X, Y, num_classes, lr, dim, n_c, beta1, beta2, params, cost, paramsAd
     #b4 -= (lr * (db4 / size))
 
 
-    v1 = beta1*v1 + (1 - beta1) * df1 / size # momentum update
-    s1 = s1 + (1 - beta2) * (df1 / size)**2 # RMSProp update
-    f1 -= lr * v1/np.sqrt(s1+1e-7) # combine momentum and RMSProp to perform update with Adam
+    v1 = beta1 * v1 + (1 - beta1) * (df1 / size)**2
+    f1 -= lr * (df1 / size)/(np.sqrt(v1) + 1e-7)
 
-    #print(lr * v1/np.sqrt(s1+1e-7))
+    bv1 = beta1 * bv1 + (1 - beta1) * (db1 / size)**2
+    b1 -= lr * (db1 / size)/(np.sqrt(bv1) + 1e-7)
 
-    bv1 = beta1*bv1 + (1-beta1) * db1/size
-    bs1 = beta2*bs1 + (1-beta2)*(db1/size)**2
-    b1 -= lr * bv1/np.sqrt(bs1+1e-7)
+    v2 = beta1 * v2 + (1 - beta1) * (df2 / size)**2
+    f2 -= lr * (df2 / size)/(np.sqrt(v2) + 1e-7)
 
-    v2 = beta1*v2 + (1-beta1)*df2/size
-    s2 = beta2*s2 + (1-beta2)*(df2/size)**2
-    f2 -= lr * v2/np.sqrt(s2+1e-7)
+    bv2 = beta1 * bv2 + (1 - beta1) * (db2 / size)**2
+    b2 -= lr * (db2 / size)/(np.sqrt(bv2) + 1e-7)
 
-    bv2 = beta1*bv2 + (1-beta1) * db2/size
-    bs2 = beta2*bs2 + (1-beta2)*(db2/size)**2
-    b2 -= lr * bv2/np.sqrt(bs2+1e-7)
+    v3 = beta1 * v3 + (1 - beta1) * (dw3 / size)**2
+    w3 -= lr * (dw3 / size)/(np.sqrt(v3) + 1e-7)
 
-    v3 = beta1*v3 + (1-beta1) * dw3/size
-    s3 = beta2*s3 + (1-beta2)*(dw3/size)**2
-    w3 -= lr * v3/np.sqrt(s3+1e-7)
+    bv3 = beta1 * bv3 + (1 - beta1) * (db3 / size)**2
+    b3 -= lr * (db3 / size)/(np.sqrt(bv3) + 1e-7)
 
-    bv3 = beta1*bv3 + (1-beta1) * db3/size
-    bs3 = beta2*bs3 + (1-beta2)*(db3/size)**2
-    b3 -= lr * bv3/np.sqrt(bs3+1e-7)
+    v4 = beta1 * v4 + (1 - beta1) * (dw4 / size)**2
+    w4 -= lr * (dw4 / size)/(np.sqrt(v4) + 1e-7)
 
-    v4 = beta1*v4 + (1-beta1) * dw4/size
-    s4 = beta2*s4 + (1-beta2)*(dw4/size)**2
-    w4 -= lr * v4 / np.sqrt(s4+1e-7)
-
-    bv4 = beta1*bv4 + (1-beta1)*db4/size
-    bs4 = beta2*bs4 + (1-beta2)*(db4/size)**2
-    b4 -= lr * bv4 / np.sqrt(bs4+1e-7)
+    bv4 = beta1 * bv4 + (1 - beta1) * (db4 / size)**2
+    b4 -= lr * (db4 / size) / (np.sqrt(bv4) + 1e-7)
 
     cost_ = cost_/size
     cost.append(cost_)
@@ -195,9 +185,7 @@ def adamGD(X, Y, num_classes, lr, dim, n_c, beta1, beta2, params, cost, paramsAd
 #####################################################
 ##################### Training ######################
 #####################################################
-
-
-def train(num_classes = 10, lr = 0.001, beta1 = 0.95, beta2 = 0.99, img_dim = 28, img_depth = 1, f = 5, num_filt1 = 3, num_filt2 = 3, num_epochs = 100):
+def train(num_classes = 10, lr = 0.001, beta1 = 0.95, beta2 = 0.99, img_dim = 28, img_depth = 1, f = 5, num_filt1 = 3, num_filt2 = 3, num_epochs = 50):
 
     X, Y = extractMNIST('./mnist/training')
 
