@@ -4,48 +4,47 @@ def matrix_factorization(R, k, iteration):
 
     user_count, item_count = R.shape
 
-    weight_P = np.random.normal(size=(user_count, k))
-    weight_Q = np.random.normal(size=(item_count, k))
+    P = np.random.normal(size=(user_count, k))
+    Q = np.random.normal(size=(item_count, k))
 
-    bias_P = np.zeros(user_count)
-    bias_Q = np.zeros(item_count)
+    bu = np.zeros(user_count)
+    bi = np.zeros(item_count)
 
     for iter in range(iteration):
         for u in range(user_count):
             for i in range(item_count):
                 r = R[u, i]
                 if r >= 0:
-                    error = r - prediction(weight_P[u, :], weight_Q[i, :], bias_P[u], bias_Q[i])
+                    error = prediction(P[u, :], Q[i, :], bu[u], bi[i]) - r
 
-                    weight_delta_Q, bias_delta_Q = gradient(error, weight_P[u, :])
-                    weight_delta_P, bias_delta_P = gradient(error, weight_Q[i, :])
+                    delta_Q, delta_bi = gradient(error, P[u, :])
+                    delta_P, delta_bu = gradient(error, Q[i, :])
 
-                    weight_P[u, :] += weight_delta_P
-                    bias_P[u] += bias_delta_P
+                    P[u, :] -= delta_P
+                    bu[u] -= delta_bu
 
-                    weight_Q[i, :] += weight_delta_Q
-                    bias_Q[i] += bias_delta_Q
+                    Q[i, :] -= delta_Q
+                    bi[i] -= delta_bi
 
-    return weight_P.dot(weight_Q.T) + bias_P[:, np.newaxis] + bias_Q[np.newaxis:, ]
+    return P.dot(Q.T) + bu[:, np.newaxis] + bi[np.newaxis:, ]
 
 def gradient(error, weight):
 
-    learning_rate = 0.01
+    learning_rate = 0.005
 
-    weight_delta = learning_rate * error * weight
+    weight_delta = learning_rate * np.dot(weight.T, error)
 
-    bias_delta = learning_rate * error
+    bias_delta = learning_rate * np.sum(error)
 
     return weight_delta, bias_delta
 
 
-def prediction(P, Q, b_P, b_Q):
+def prediction(P, Q, bu, bi):
 
-	return P.dot(Q.T) + b_P + b_Q
+	return P.dot(Q.T) + bu + bi
 
 
-
-iteration = 5000
+iteration = 100000
 k = 3
 R = np.array([
     [2, 8, 9, 1, 8],
