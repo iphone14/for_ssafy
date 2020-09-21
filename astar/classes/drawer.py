@@ -3,19 +3,33 @@ from classes.point import Point
 import os
 
 step = 0
+RectSize = 120
 
-def draw(map):
+def draw(map, start, stop):
+
+    global RectSize
 
     width = map.width
     height = map.height
-    length = 120
 
-    image = Image.new('RGB', (width * length, height * length), color = 'white')
+    image = Image.new('RGB', (width * RectSize, height * RectSize), color = 'white')
+    drawer = ImageDraw.Draw(image)
 
     for y in range(height):
         for x in range(width):
             node = map.getNode(Point(x, y))
-            drawNode(node, image, width, height, length)
+            point = Point(x * RectSize, (height - y - 1) * RectSize)
+
+            drawRect(node, point, drawer)
+
+            if node.getPoint() == start:
+                drawText(node, point, drawer, 'S')
+            elif node.getPoint() == stop:
+                drawText(node, point, drawer, 'E')
+
+            if node.getState() == 'c' or node.getState() == 'o':
+                drawCost(node, point, drawer)
+                drawTriangle(node, point, drawer)
 
     saveFile(image)
 
@@ -34,30 +48,53 @@ def saveFile(image):
     step += 1
 
 
-def drawCost(node, start, padding, drawer):
+def drawCost(node, point, drawer):
+
+    global RectSize
+
+    padding = RectSize * 0.05
 
     font = ImageFont.truetype("arial.ttf", 18)
     cost = str(node.costG()) + ' + ' + str(node.costH()) + ' = ' + str(node.costG() + node.costH())
 
-    drawer.text((start.x + padding, start.y + padding), cost, font=font, fill=(0, 0, 0))
+    drawer.text((point.x + padding, point.y + padding), cost, font=font, fill=(0, 0, 0))
 
+def drawText(node, point, drawer, text):
 
-def drawRect(node, start, length, drawer):
+    global RectSize
+
+    fontSize = 18
+
+    font = ImageFont.truetype("arial.ttf", 18)
+
+    drawer.text((point.x + 5, point.y +  RectSize - (fontSize) - 5), text, font=font, fill=(0, 0, 0))
+
+def drawRect(node, point, drawer):
+
+    global RectSize
 
     colorMap = {'c':'green', 'b':'black', 'o':'orange', 'e':'white'}
 
-    drawer.rectangle([(start.x, start.y), (start.x + length, start.y + length)], colorMap[node.getState()], 'black',  1)
+    drawer.rectangle([(point.x, point.y), (point.x + RectSize, point.y + RectSize)], colorMap[node.getState()], 'black',  1)
 
 
-def drawTriangle(node, start, length, drawer):
+def drawRectColor(node, point, drawer, color):
+
+    global RectSize
+
+    drawer.rectangle([(point.x, point.y), (point.x + RectSize, point.y + RectSize)], color, 'black',  1)
+
+def drawTriangle(node, point, drawer):
 
     if node.getParent() is None:
         return
 
-    centerX = start.x + (length / 2)
-    centerY =  start.y + (length / 2) + 15
+    global RectSize
 
-    crossLength = length * 0.25
+    centerX = point.x + (RectSize / 2)
+    centerY =  point.y + (RectSize / 2) + 15
+
+    crossLength = RectSize * 0.25
 
     angleLength = crossLength * 0.707
 
@@ -90,19 +127,3 @@ def drawTriangle(node, start, length, drawer):
 
         drawer.line([(lineStart.x, lineStart.y), (lineEnd.x, lineEnd.y)], fill ="red", width = 4)
         drawer.ellipse([leftUp, rightDown], fill = 'red')
-
-
-def drawNode(node, image, width, height, length):
-
-    drawer = ImageDraw.Draw(image)
-
-    point = node.getPoint()
-    padding = length * 0.05
-
-    start = Point(point.x * length, (height - point.y - 1) * length)
-
-    drawRect(node, start, length, drawer)
-
-    if node.getState() == 'c' or node.getState() == 'o':
-        drawCost(node, start, padding, drawer)
-        drawTriangle(node, start, length, drawer)

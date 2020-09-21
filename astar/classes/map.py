@@ -1,7 +1,5 @@
 from classes.node import Node
 from classes.point import Point
-import classes.drawer as drawer
-
 
 class Map:
     def __init__(self, data, width, height, stop):
@@ -41,35 +39,20 @@ class Map:
 
     def show(self):
 
-        drawer.draw(self)
         text = []
-        text2 = []
-        text3 = []
 
         for y in range(self.height):
             line = []
-            line2 = []
-            line3 = []
             for x in range(self.width):
                 node = self.getNode(Point(x, self.height - y - 1))
-                #line.append(repr(node.getPoint()))
-                #line.append(str(node.costG())+ ",  ")
-
-                line.append(str(node.getState()) + ",  ")
 
                 if node.getState() == 'o':
-                    line2.append(str(node.costG()) + ",  ")
+                    line.append(str(node.costG()) + ",  ")
                 else:
-                    line2.append(str(node.getState()) + ",  ")
-
-                line3.append(str(node.costF()) + ",  ")
+                    line.append(str(node.getState()) + ",  ")
 
             line.append('\n')
-            line2.append('\n')
-            line3.append('\n')
 
             text += line
-            text2 += line2
 
-        """print("".join(text))"""
-        print("".join(text2))
+        print("".join(text))

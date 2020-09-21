@@ -3,6 +3,7 @@ from classes.node import Node
 from classes.openList import OpenList
 from classes.point import Point
 from classes.map import Map
+import classes.drawer as drawer
 
 def aStar(start, stop, nodeMap):
 
@@ -12,20 +13,17 @@ def aStar(start, stop, nodeMap):
 
     while True:
 
-
         node.setClose()
 
-        map.show()
 
         if node.getPoint() == stop:
             return node
 
         childList = lookAround(node, nodeMap)
 
-
-        map.show()
-
         openList.append(childList)
+
+        drawer.draw(map, start, stop)
 
         node = openList.minCostNode()
 
@@ -110,8 +108,6 @@ data = [
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0]
 
-print(len(data))
-
 width = 8
 height = 6
 
@@ -120,7 +116,6 @@ stop = Point(6, 3)
 
 map = Map(data, width, height, stop)
 node = aStar(start, stop, map)
-
 
 while node:
     print(node.getPoint())
