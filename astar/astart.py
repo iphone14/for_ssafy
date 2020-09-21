@@ -15,7 +15,6 @@ def aStar(start, stop, nodeMap):
 
         node.setClose()
 
-
         if node.getPoint() == stop:
             return node
 
@@ -23,8 +22,9 @@ def aStar(start, stop, nodeMap):
 
         openList.append(childList)
 
+        #map.show()
         drawer.draw(map, start, stop)
-
+        
         node = openList.minCostNode()
 
         if node is None:

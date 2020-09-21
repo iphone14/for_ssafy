@@ -59,6 +59,7 @@ def drawCost(node, point, drawer):
 
     drawer.text((point.x + padding, point.y + padding), cost, font=font, fill=(0, 0, 0))
 
+
 def drawText(node, point, drawer, text):
 
     global RectSize
@@ -83,6 +84,7 @@ def drawRectColor(node, point, drawer, color):
     global RectSize
 
     drawer.rectangle([(point.x, point.y), (point.x + RectSize, point.y + RectSize)], color, 'black',  1)
+
 
 def drawTriangle(node, point, drawer):
 
