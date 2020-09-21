@@ -4,7 +4,6 @@ import os
 
 step = 0
 
-
 def draw(map):
 
     width = map.width
@@ -35,31 +34,63 @@ def saveFile(image):
     step += 1
 
 
-def drawCost(node, startX, startY, padding, drawer):
+def drawCost(node, start, padding, drawer):
 
     font = ImageFont.truetype("arial.ttf", 18)
     cost = str(node.costG()) + ' + ' + str(node.costH()) + ' = ' + str(node.costG() + node.costH())
 
-    drawer.text((startX + padding, startY + padding), cost, font=font, fill=(0, 0, 0))
+    drawer.text((start.x + padding, start.y + padding), cost, font=font, fill=(0, 0, 0))
 
 
-def drawRect(node, startX, startY, length, drawer):
+def drawRect(node, start, length, drawer):
 
     colorMap = {'c':'green', 'b':'black', 'o':'orange', 'e':'white'}
 
-    drawer.rectangle([(startX, startY), (startX + length, startY + length)], colorMap[node.getState()], 'black',  1)
+    drawer.rectangle([(start.x, start.y), (start.x + length, start.y + length)], colorMap[node.getState()], 'black',  1)
 
 
-def drawTriangle(node, startX, startY, length, drawer):
-
-    drawer.polygon([(50, 50), (60, 90), (40, 90)], fill='yellow')
+def drawTriangle(node, start, length, drawer):
 
     if node.getParent() is None:
         return
 
-    diff = node.getParent().getPoint() - node.getPoint()
+    centerX = start.x + (length / 2)
+    centerY =  start.y + (length / 2) + 15
 
-    print(diff)
+    crossLength = length * 0.25
+
+    angleLength = crossLength * 0.707
+
+    lineStart = None
+    lineEnd = None
+
+    diff = node.getPoint() - node.getParent().getPoint()
+
+    diffList = {str(Point(1, 0)):[Point(-crossLength, 0), Point(crossLength, 0)],
+                str(Point(-1, 0)):[Point(crossLength, 0), Point(-crossLength, 0)],
+                str(Point(0, 1)):[Point(0, crossLength), Point(0, -crossLength)],
+                str(Point(0, -1)):[Point(0, -crossLength), Point(0, crossLength)],
+                str(Point(1, 1)):[Point(-angleLength, angleLength), Point(angleLength, -angleLength)],
+                str(Point(1, -1)):[Point(-angleLength, -angleLength), Point(angleLength, angleLength)],
+                str(Point(-1, -1)):[Point(angleLength, -angleLength), Point(-angleLength, angleLength)],
+                str(Point(-1, 1)):[Point(angleLength, angleLength), Point(-angleLength, -angleLength)]}
+
+    findDiff = diffList[str(diff)]
+
+    if findDiff is None:
+        return
+
+    lineStart = findDiff[0] + Point(centerX, centerY)
+    lineEnd = findDiff[1] + Point(centerX, centerY)
+
+    if lineStart is not None and lineEnd is not None:
+        radius = 5
+        leftUp = (lineStart.x - radius, lineStart.y - radius)
+        rightDown = (lineStart.x + radius, lineStart.y + radius)
+
+        drawer.line([(lineStart.x, lineStart.y), (lineEnd.x, lineEnd.y)], fill ="red", width = 4)
+        drawer.ellipse([leftUp, rightDown], fill = 'red')
+
 
 def drawNode(node, image, width, height, length):
 
@@ -68,15 +99,10 @@ def drawNode(node, image, width, height, length):
     point = node.getPoint()
     padding = length * 0.05
 
-    startX = point.x * length
-    startY = (height - point.y - 1) * length
+    start = Point(point.x * length, (height - point.y - 1) * length)
 
-    drawRect(node, startX, startY, length, drawer)
+    drawRect(node, start, length, drawer)
 
     if node.getState() == 'c' or node.getState() == 'o':
-        drawCost(node, startX, startY, padding, drawer)
-        drawTriangle(node, startX, startY, length, drawer)
-
-
-
-        #draw.line((0, 0) + img.size, fill=128)
+        drawCost(node, start, padding, drawer)
+        drawTriangle(node, start, length, drawer)

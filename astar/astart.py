@@ -11,14 +11,19 @@ def aStar(start, stop, nodeMap):
     node = map.getNode(start)
 
     while True:
+
+
         node.setClose()
+
+        map.show()
 
         if node.getPoint() == stop:
             return node
 
-        map.show()
-
         childList = lookAround(node, nodeMap)
+
+
+        map.show()
 
         openList.append(childList)
 
