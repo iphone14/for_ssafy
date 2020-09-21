@@ -67,7 +67,7 @@ def drawText(node, point, drawer, text):
 
     font = ImageFont.truetype("arial.ttf", 18)
 
-    drawer.text((point.x + 5, point.y +  RectSize - (fontSize) - 5), text, font=font, fill=(0, 0, 0))
+    drawer.text((point.x + 5, point.y +  RectSize - (fontSize) - 5), text, font=font, fill=(255, 0, 255))
 
 def drawRect(node, point, drawer):
 
