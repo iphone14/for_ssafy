@@ -17,3 +17,9 @@ class Point:
             return NotImplemented
 
         return Point(self.x + other.x, self.y + other.y)
+
+    def __sub__(self, other):
+        if not isinstance(other, Point):
+            return NotImplemented
+
+        return Point(self.x - other.x, self.y - other.y)

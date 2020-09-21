@@ -1,5 +1,7 @@
 from classes.node import Node
 from classes.point import Point
+import classes.drawer as drawer
+
 
 class Map:
     def __init__(self, data, width, height, stop):
@@ -38,6 +40,8 @@ class Map:
             return None
 
     def show(self):
+
+        drawer.draw(self)
         text = []
         text2 = []
         text3 = []
