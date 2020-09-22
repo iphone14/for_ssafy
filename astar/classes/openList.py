@@ -6,7 +6,7 @@ class OpenList:
     def append(self, list):
         self.list = self.list + list
 
-    def minCostNode(self):
+    def minCostFNode(self):
 
         minNode = None
         minIndex = -1

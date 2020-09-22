@@ -22,10 +22,7 @@ def aStar(start, stop, nodeMap):
 
         openList.append(childList)
 
-        #map.show()
-        drawer.draw(map, start, stop)
-        
-        node = openList.minCostNode()
+        node = openList.minCostFNode()
 
         if node is None:
             return None
