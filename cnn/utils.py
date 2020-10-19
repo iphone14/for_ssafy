@@ -77,7 +77,7 @@ def predict(image, f1, f2, w3, w4, b1, b2, b3, b4, conv_s = 1, pool_f = 2, pool_
     conv2 = convolution(conv1, f2, b2, conv_s) # second convolution operation
     conv2[conv2<=0] = 0 # pass through ReLU non-linearity
 
-    pooled = maxpool(conv2, pool_f, pool_s) # maxpooling operation
+    pooled = maxpool(conv2, pool_s) # maxpooling operation
     (nf2, dim2, _) = pooled.shape
     fc = pooled.reshape((nf2 * dim2 * dim2, 1)) # flatten pooled layer
 

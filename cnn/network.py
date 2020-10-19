@@ -12,9 +12,10 @@ from array import *
 from random import shuffle
 
 
-def conv(image, label, params, pool_f, pool_s):
+def conv(image, label, params):
 
-    stride = 1
+    conv_stride = 1
+    pool_stride = 2
 
     [f1, f2, w3, w4, b1, b2, b3, b4] = params
 
@@ -22,14 +23,14 @@ def conv(image, label, params, pool_f, pool_s):
     ############## Forward Operation ###############
     ################################################
 
-    conv1 = convolution(image, f1, b1, stride) # convolution operation
+    conv1 = convolution(image, f1, b1, conv_stride) # convolution operation
     conv1[conv1<=0] = 0 # pass through ReLU non-linearity
 
 
-    conv2 = convolution(conv1, f2, b2, stride) # second convolution operation
+    conv2 = convolution(conv1, f2, b2, conv_stride) # second convolution operation
     conv2[conv2<=0] = 0 # pass through ReLU non-linearity
 
-    pooled = maxpool(conv2, pool_f, pool_s) # maxpooling operation
+    pooled = maxpool(conv2, pool_stride) # maxpooling operation
 
     #print(pooled.shape)
 
@@ -74,13 +75,13 @@ def conv(image, label, params, pool_f, pool_s):
     dfc = w3.T.dot(dz) # loss gradients of fully-connected layer (pooling layer)
     dpool = dfc.reshape(pooled.shape) # reshape fully connected into dimensions of pooling layer
 
-    dconv2 = maxpoolBackward(dpool, conv2, pool_f, pool_s) # backprop through the max-pooling layer(only neurons with highest activation in window get updated)
+    dconv2 = maxpoolBackward(dpool, conv2, pool_stride) # backprop through the max-pooling layer(only neurons with highest activation in window get updated)
     dconv2[conv2<=0] = 0 # backpropagate through ReLU
 
-    dconv1, df2, db2 = convolutionBackward(dconv2, conv1, f2, stride) # backpropagate previous gradient through second convolutional layer.
+    dconv1, df2, db2 = convolutionBackward(dconv2, conv1, f2, conv_stride) # backpropagate previous gradient through second convolutional layer.
     dconv1[conv1<=0] = 0 # backpropagate through ReLU
 
-    dimage, df1, db1 = convolutionBackward(dconv1, image, f1, stride) # backpropagate previous gradient through first convolutional layer.
+    dimage, df1, db1 = convolutionBackward(dconv1, image, f1, conv_stride) # backpropagate previous gradient through first convolutional layer.
 
     grads = [df1, df2, dw3, dw4, db1, db2, db3, db4]
 
@@ -122,7 +123,7 @@ def adamGD(X, Y, num_classes, dim, n_c, params, cost, paramsAdam):
         y = np.eye(num_classes)[int(Y[i])].reshape(num_classes, 1) # convert label to one-hot
 
         # Collect Gradients for training example
-        grads, loss = conv(x, y, params, 2, 2)
+        grads, loss = conv(x, y, params)
         [df1_, df2_, dw3_, dw4_, db1_, db2_, db3_, db4_] = grads
 
         df1+=df1_

@@ -9,6 +9,7 @@ import utils
 def convolutionBackward(dconv_prev, conv_in, filt, s):
 
     #dconv2, conv1, f2, conv_s
+    
     '''
     Backpropagation through a convolutional layer.
     '''
@@ -39,7 +40,7 @@ def convolutionBackward(dconv_prev, conv_in, filt, s):
 
 
 
-def maxpoolBackward(dpool, orig, f, s):
+def maxpoolBackward(dpool, orig, s):
 
     '''
     Backpropagation through a maxpooling layer. The gradients are passed through the indices of greatest value in the original maxpooling during the forward step.
@@ -48,15 +49,14 @@ def maxpoolBackward(dpool, orig, f, s):
 
     dout = np.zeros(orig.shape)
 
-    
 
     for curr_c in range(n_c):
         curr_y = out_y = 0
-        while curr_y + f <= orig_dim:
+        while curr_y + s <= orig_dim:
             curr_x = out_x = 0
-            while curr_x + f <= orig_dim:
+            while curr_x + s <= orig_dim:
                 # obtain index of largest value in input for current window
-                (a, b) = utils.nanargmax(orig[curr_c, curr_y:curr_y+f, curr_x:curr_x+f])
+                (a, b) = utils.nanargmax(orig[curr_c, curr_y:curr_y+s, curr_x:curr_x+s])
                 dout[curr_c, curr_y+a, curr_x+b] = dpool[curr_c, out_y, out_x]
                 curr_x += s
                 out_x += 1
