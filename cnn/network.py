@@ -12,7 +12,9 @@ from array import *
 from random import shuffle
 
 
-def conv(image, label, params, conv_s, pool_f, pool_s):
+def conv(image, label, params, pool_f, pool_s):
+
+    stride = 1
 
     [f1, f2, w3, w4, b1, b2, b3, b4] = params
 
@@ -20,11 +22,11 @@ def conv(image, label, params, conv_s, pool_f, pool_s):
     ############## Forward Operation ###############
     ################################################
 
-    conv1 = convolution(image, f1, b1, conv_s) # convolution operation
+    conv1 = convolution(image, f1, b1, stride) # convolution operation
     conv1[conv1<=0] = 0 # pass through ReLU non-linearity
 
 
-    conv2 = convolution(conv1, f2, b2, conv_s) # second convolution operation
+    conv2 = convolution(conv1, f2, b2, stride) # second convolution operation
     conv2[conv2<=0] = 0 # pass through ReLU non-linearity
 
     pooled = maxpool(conv2, pool_f, pool_s) # maxpooling operation
@@ -75,10 +77,10 @@ def conv(image, label, params, conv_s, pool_f, pool_s):
     dconv2 = maxpoolBackward(dpool, conv2, pool_f, pool_s) # backprop through the max-pooling layer(only neurons with highest activation in window get updated)
     dconv2[conv2<=0] = 0 # backpropagate through ReLU
 
-    dconv1, df2, db2 = convolutionBackward(dconv2, conv1, f2, conv_s) # backpropagate previous gradient through second convolutional layer.
+    dconv1, df2, db2 = convolutionBackward(dconv2, conv1, f2, stride) # backpropagate previous gradient through second convolutional layer.
     dconv1[conv1<=0] = 0 # backpropagate through ReLU
 
-    dimage, df1, db1 = convolutionBackward(dconv1, image, f1, conv_s) # backpropagate previous gradient through first convolutional layer.
+    dimage, df1, db1 = convolutionBackward(dconv1, image, f1, stride) # backpropagate previous gradient through first convolutional layer.
 
     grads = [df1, df2, dw3, dw4, db1, db2, db3, db4]
 
@@ -89,7 +91,6 @@ def conv(image, label, params, conv_s, pool_f, pool_s):
 #####################################################
 
 def adamGD(X, Y, num_classes, dim, n_c, params, cost, paramsAdam):
-
 
     [f1, f2, w3, w4, b1, b2, b3, b4] = params
 
@@ -111,19 +112,17 @@ def adamGD(X, Y, num_classes, dim, n_c, params, cost, paramsAdam):
     db4 = np.zeros(b4.shape)
 
 
-    print(size)
-
+    #size is image count
 
 
     for i in range(size):
 
         x = X[i]
 
-
         y = np.eye(num_classes)[int(Y[i])].reshape(num_classes, 1) # convert label to one-hot
 
         # Collect Gradients for training example
-        grads, loss = conv(x, y, params, 1, 2, 2)
+        grads, loss = conv(x, y, params, 2, 2)
         [df1_, df2_, dw3_, dw4_, db1_, db2_, db3_, db4_] = grads
 
         df1+=df1_
@@ -192,7 +191,7 @@ def adamGD(X, Y, num_classes, dim, n_c, params, cost, paramsAdam):
 #####################################################
 ##################### Training ######################
 #####################################################
-def train(num_classes = 10, img_dim = 28, img_depth = 1, f = 5, num_filt1 = 3, num_filt2 = 3, num_epochs = 50):
+def train(num_classes = 10, img_dim = 28, img_depth = 1, f = 5, num_filt1 = 3, num_filt2 = 3):
 
     X, Y = extractMNIST('./mnist/training')
 
@@ -228,8 +227,10 @@ def train(num_classes = 10, img_dim = 28, img_depth = 1, f = 5, num_filt1 = 3, n
     paramsAdam = [v1, v2, v3, v4, bv1, bv2, bv3, bv4]
 
     cost = []
-    
-    for epoch in range(num_epochs):
+
+    epochs = 50
+
+    for epoch in range(epochs):
         params, cost, paramsAdam = adamGD(X, Y, num_classes, img_dim, img_depth, params, cost, paramsAdam)
         print(cost[-1])
         #t.set_description("Cost: %.2f" % (cost[-1]))

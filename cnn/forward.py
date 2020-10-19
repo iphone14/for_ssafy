@@ -11,10 +11,10 @@ def convolution(image, filt, bias, s=1):
     Confolves `filt` over `image` using stride `s`
     '''
 
-
-
     (n_f, n_c_f, f, _) = filt.shape # filter dimensions
     n_c, in_dim, _ = image.shape # image dimensions
+
+    #n_c = color depth example filter = 1
 
     out_dim = int((in_dim - f) / s) + 1 # calculate output dimensions
 
@@ -26,14 +26,12 @@ def convolution(image, filt, bias, s=1):
 
     # convolve the filter over every part of the image, adding the bias at each step.
 
-
     for curr_f in range(n_f):
         curr_y = out_y = 0
-        flag = True
         while curr_y + f <= in_dim:
             curr_x = out_x = 0
             while curr_x + f <= in_dim:
-                out[curr_f, out_y, out_x] = np.sum(filt[curr_f] * image[:,curr_y:curr_y+f, curr_x:curr_x+f]) + bias[curr_f]
+                out[curr_f, out_y, out_x] = np.sum(filt[curr_f] * image[:,curr_y:curr_y+f, curr_x:curr_x + f]) + bias[curr_f]
                 curr_x += s
                 out_x += 1
             curr_y += s
