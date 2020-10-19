@@ -88,7 +88,7 @@ def conv(image, label, params, conv_s, pool_f, pool_s):
 ################### Optimization ####################
 #####################################################
 
-def adamGD(X, Y, num_classes, lr, dim, n_c, beta1, beta2, params, cost, paramsAdam):
+def adamGD(X, Y, num_classes, dim, n_c, params, cost, paramsAdam):
 
 
     [f1, f2, w3, w4, b1, b2, b3, b4] = params
@@ -111,10 +111,14 @@ def adamGD(X, Y, num_classes, lr, dim, n_c, beta1, beta2, params, cost, paramsAd
     db4 = np.zeros(b4.shape)
 
 
+    print(size)
+
+
 
     for i in range(size):
 
         x = X[i]
+
 
         y = np.eye(num_classes)[int(Y[i])].reshape(num_classes, 1) # convert label to one-hot
 
@@ -148,6 +152,9 @@ def adamGD(X, Y, num_classes, lr, dim, n_c, beta1, beta2, params, cost, paramsAd
 
     #w4 -= (lr * (dw4 / size))
     #b4 -= (lr * (db4 / size))
+
+    lr = 0.001
+    beta1 = 0.95
 
 
     v1 = beta1 * v1 + (1 - beta1) * (df1 / size)**2
@@ -185,7 +192,7 @@ def adamGD(X, Y, num_classes, lr, dim, n_c, beta1, beta2, params, cost, paramsAd
 #####################################################
 ##################### Training ######################
 #####################################################
-def train(num_classes = 10, lr = 0.001, beta1 = 0.95, beta2 = 0.99, img_dim = 28, img_depth = 1, f = 5, num_filt1 = 3, num_filt2 = 3, num_epochs = 50):
+def train(num_classes = 10, img_dim = 28, img_depth = 1, f = 5, num_filt1 = 3, num_filt2 = 3, num_epochs = 50):
 
     X, Y = extractMNIST('./mnist/training')
 
@@ -231,12 +238,11 @@ def train(num_classes = 10, lr = 0.001, beta1 = 0.95, beta2 = 0.99, img_dim = 28
 
     paramsAdam = [v1, v2, v3, v4, bv1, bv2, bv3, bv4, s1, s2, s3, s4, bs1, bs2, bs3, bs4]
 
-
     cost = []
 
     a = 0
     for epoch in range(num_epochs):
-        params, cost, paramsAdam = adamGD(X, Y, num_classes, lr, img_dim, img_depth, beta1, beta2, params, cost, paramsAdam)
+        params, cost, paramsAdam = adamGD(X, Y, num_classes, img_dim, img_depth, params, cost, paramsAdam)
         print(cost[-1])
         #t.set_description("Cost: %.2f" % (cost[-1]))
         #a = a + 1
