@@ -93,7 +93,7 @@ def adamGD(X, Y, num_classes, dim, n_c, params, cost, paramsAdam):
 
     [f1, f2, w3, w4, b1, b2, b3, b4] = params
 
-    [v1, v2, v3, v4, bv1, bv2, bv3, bv4, s1, s2, s3, s4, bs1, bs2, bs3, bs4] = paramsAdam
+    [v1, v2, v3, v4, bv1, bv2, bv3, bv4] = paramsAdam
 
     size = len(X)
     X = X.reshape(size, n_c, dim, dim)
@@ -185,7 +185,7 @@ def adamGD(X, Y, num_classes, dim, n_c, params, cost, paramsAdam):
     cost.append(cost_)
 
     params = [f1, f2, w3, w4, b1, b2, b3, b4]
-    paramsAdam = [v1, v2, v3, v4, bv1, bv2, bv3, bv4, s1, s2, s3, s4, bs1, bs2, bs3, bs4]
+    paramsAdam = [v1, v2, v3, v4, bv1, bv2, bv3, bv4]
 
     return params, cost, paramsAdam
 
@@ -209,8 +209,6 @@ def train(num_classes = 10, img_dim = 28, img_depth = 1, f = 5, num_filt1 = 3, n
     w3 = initializeWeight(w3)
     w4 = initializeWeight(w4)
 
-
-
     b1 = np.zeros((f1.shape[0],1))
     b2 = np.zeros((f2.shape[0],1))
     b3 = np.zeros((w3.shape[0],1))
@@ -227,20 +225,10 @@ def train(num_classes = 10, img_dim = 28, img_depth = 1, f = 5, num_filt1 = 3, n
     bv3 = np.zeros(b3.shape)
     bv4 = np.zeros(b4.shape)
 
-    s1 = np.zeros(f1.shape)
-    s2 = np.zeros(f2.shape)
-    s3 = np.zeros(w3.shape)
-    s4 = np.zeros(w4.shape)
-    bs1 = np.zeros(b1.shape)
-    bs2 = np.zeros(b2.shape)
-    bs3 = np.zeros(b3.shape)
-    bs4 = np.zeros(b4.shape)
-
-    paramsAdam = [v1, v2, v3, v4, bv1, bv2, bv3, bv4, s1, s2, s3, s4, bs1, bs2, bs3, bs4]
+    paramsAdam = [v1, v2, v3, v4, bv1, bv2, bv3, bv4]
 
     cost = []
-
-    a = 0
+    
     for epoch in range(num_epochs):
         params, cost, paramsAdam = adamGD(X, Y, num_classes, img_dim, img_depth, params, cost, paramsAdam)
         print(cost[-1])
