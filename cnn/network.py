@@ -16,6 +16,7 @@ def conv(image, label, params):
 
     conv_stride = 1
     pool_stride = 2
+    pool_size = 2
 
     [f1, f2, w3, w4, b1, b2, b3, b4] = params
 
@@ -34,7 +35,7 @@ def conv(image, label, params):
     conv2 = convolution(conv1, f2, b2, conv_stride)
     conv2[conv2<=0] = 0 #ReLU
 
-    pooled = maxpool(conv2, pool_stride)
+    pooled = maxpool(conv2, pool_size, pool_stride)
 
     fc = pooled.reshape((-1, 1)) # flatten
 
@@ -50,7 +51,7 @@ def conv(image, label, params):
     ############# Backward Operation ###############
     ################################################
     dout = probs - label # derivative of loss w.r.t. final dense layer output
-    
+
     dw4 = dout.dot(z.T) # loss gradient of final dense layer weights
     db4 = np.sum(dout, axis = 1).reshape(b4.shape) # loss gradient of final dense layer biases
 
@@ -62,7 +63,7 @@ def conv(image, label, params):
     dfc = w3.T.dot(dz) # loss gradients of fully-connected layer (pooling layer)
     dpool = dfc.reshape(pooled.shape) # reshape fully connected into dimensions of pooling layer
 
-    dconv2 = maxpoolBackward(dpool, conv2, pool_stride) # backprop through the max-pooling layer(only neurons with highest activation in window get updated)
+    dconv2 = maxpoolBackward(dpool, conv2, pool_size, pool_stride) # backprop through the max-pooling layer(only neurons with highest activation in window get updated)
     dconv2[conv2<=0] = 0 # backpropagate through ReLU
 
     dconv1, df2, db2 = convolutionBackward(dconv2, conv1, f2, conv_stride) # backpropagate previous gradient through second convolutional layer.
