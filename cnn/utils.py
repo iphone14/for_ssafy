@@ -40,9 +40,9 @@ def extractMNIST(path):
 		label = fileInfo['label']
 		name = fileInfo['name']
 
-		fileName = path + '/' + label + '/' + name
+		filePath = path + '/' + label + '/' + name
 
-		img = np.array(Image.open(fileName)).astype(np.float32)
+		img = np.array(Image.open(filePath)).astype(np.float32)
 
 		imgSize = img.shape[0]
 

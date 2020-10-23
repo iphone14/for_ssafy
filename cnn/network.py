@@ -23,47 +23,34 @@ def conv(image, label, params):
     ############## Forward Operation ###############
     ################################################
 
-    conv1 = convolution(image, f1, b1, conv_stride) # convolution operation
-    conv1[conv1<=0] = 0 # pass through ReLU non-linearity
 
 
-    conv2 = convolution(conv1, f2, b2, conv_stride) # second convolution operation
-    conv2[conv2<=0] = 0 # pass through ReLU non-linearity
+    conv1 = convolution(image, f1, b1, conv_stride)
+    conv1[conv1<=0] = 0 #ReLU
 
-    pooled = maxpool(conv2, pool_stride) # maxpooling operation
+    print('conv1', conv1.shape)
+    print('f1', f1.shape)
 
-    #print(pooled.shape)
+    conv2 = convolution(conv1, f2, b2, conv_stride)
+    conv2[conv2<=0] = 0 #ReLU
 
+    pooled = maxpool(conv2, pool_stride)
 
-    (nf2, dim2, _) = pooled.shape
-    #print(dim2)
-    #print(nf2 * dim2 * dim2)
-    fc = pooled.reshape((nf2 * dim2 * dim2, 1)) # flatten pooled layer
+    fc = pooled.reshape((-1, 1)) # flatten
 
+    z = w3.dot(fc) + b3 # dense
 
-    #print("fc : ", fc.shape)
-    #print('w3 : ', w3.shape)
-    #print('b3 : ', b3.shape)
+    out = w4.dot(z) + b4 # dense
 
+    probs = softmax(out)
 
-    z = w3.dot(fc) + b3 # first dense layer
-
-    out = w4.dot(z) + b4 # second dense layer
-
-    probs = softmax(out) # predict class probabilities with the softmax activation function
-
-    ################################################
-    #################### Loss ######################
-    ################################################
-
-    loss = categoricalCrossEntropy(probs, label) # categorical cross-entropy loss
+    loss = categoricalCrossEntropy(probs, label)
 
     ################################################
     ############# Backward Operation ###############
     ################################################
     dout = probs - label # derivative of loss w.r.t. final dense layer output
-
-    #print('ege', label)
+    
     dw4 = dout.dot(z.T) # loss gradient of final dense layer weights
     db4 = np.sum(dout, axis = 1).reshape(b4.shape) # loss gradient of final dense layer biases
 
@@ -200,22 +187,18 @@ def train(num_classes = 10, img_dim = 28, f = 5, num_filt1 = 3, num_filt2 = 3):
     X-= int(np.mean(X))
     X/= int(np.std(X))
 
-    #train_data = np.hstack((X, y_dash))
-
-
-
     ## Initializing all the parameters
-    f1, f2, w3, w4 = (num_filt1 ,X.shape[1], f, f), (num_filt2 ,num_filt1, f, f), (128, 300), (10, 128)
+    f1, f2, w3, w4 = (num_filt1, X.shape[1], f, f), (num_filt2, num_filt1, f, f), (128, 300), (10, 128)
 
     f1 = initializeFilter(f1)
     f2 = initializeFilter(f2)
     w3 = initializeWeight(w3)
     w4 = initializeWeight(w4)
 
-    b1 = np.zeros((f1.shape[0],1))
-    b2 = np.zeros((f2.shape[0],1))
-    b3 = np.zeros((w3.shape[0],1))
-    b4 = np.zeros((w4.shape[0],1))
+    b1 = np.zeros((f1.shape[0], 1))
+    b2 = np.zeros((f2.shape[0], 1))
+    b3 = np.zeros((w3.shape[0], 1))
+    b4 = np.zeros((w4.shape[0], 1))
 
     params = [f1, f2, w3, w4, b1, b2, b3, b4]
 

@@ -14,7 +14,6 @@ if __name__ == '__main__':
     # Normalize the data
     X -= int(np.mean(X)) # subtract mean
     X /= int(np.std(X)) # divide by standard deviation
-    
 
 
     corr = 0
