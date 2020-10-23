@@ -37,9 +37,7 @@ def convolution(image, filt, bias, s):
             curr_y += s
             out_y += 1
 
-
     return out
-
 
 def maxpool(image, f=2, s=2):
     '''
@@ -47,8 +45,9 @@ def maxpool(image, f=2, s=2):
     '''
     n_c, h_prev, w_prev = image.shape
 
-    h = int((h_prev - f)/s)+1
-    w = int((w_prev - f)/s)+1
+    h = int(h_prev/s)
+    w = int(w_prev/s)
+    
 
     downsampled = np.zeros((n_c, h, w))
     for i in range(n_c):

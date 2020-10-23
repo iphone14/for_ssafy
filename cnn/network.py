@@ -11,22 +11,31 @@ import os
 from array import *
 from random import shuffle
 
+conv_padding = 0
+conv_stride = 1
+
+pool_stride = 2
+pool_size = 4 # pool_size > pool_stride
+pool_padding = 0
 
 def conv(image, label, params):
-
-    conv_stride = 1
-    pool_stride = 2
-    pool_size = 2
 
     [f1, f2, w3, w4, b1, b2, b3, b4] = params
 
     conv1 = convolution(image, f1, b1, conv_stride)
     conv1[conv1<=0] = 0 #ReLU
 
+    #print(conv1.shape)
+
     conv2 = convolution(conv1, f2, b2, conv_stride)
     conv2[conv2<=0] = 0 #ReLU
 
+    #print('c2', conv2.shape)
+
+
     pooled = maxpool(conv2, pool_size, pool_stride)
+
+    #print('pool', pooled.shape)
 
     fc = pooled.reshape((-1, 1)) # flatten
 
@@ -67,7 +76,7 @@ def conv(image, label, params):
     return grads, loss
 
 
-def adamGD(X, Y, num_classes, dim, params, cost, paramsAdam):
+def adamGD(X, Y, num_classes, params, cost, paramsAdam):
 
     [f1, f2, w3, w4, b1, b2, b3, b4] = params
 
@@ -161,21 +170,38 @@ def adamGD(X, Y, num_classes, dim, params, cost, paramsAdam):
 
     return params, cost, paramsAdam
 
-#####################################################
-##################### Training ######################
-#####################################################
-def train(num_classes = 10, img_dim = 28, f = 5, num_filt1 = 3, num_filt2 = 3):
+def calConvOutSize(height, filterSize):
+    return ((height + (conv_padding*2) - filterSize) / conv_stride) + 1
+
+def calPoolOutSize(height, padding):
+
+    if pool_padding != 0:
+        return (height - pool_size + 1) / pool_stride
+    else:
+        a = height / pool_stride
+        return a
+
+def train(num_classes = 10, num_filt1 = 5, num_filt2 = 5):
 
     X, Y = extractMNIST('./mnist/training')
 
     X-= int(np.mean(X))
     X/= int(np.std(X))
 
-
     densSize = 128
 
+    filterSize_1 = 3
+    filterSize_2 = 3
+
+    print(calConvOutSize(X.shape[2], filterSize_1))
+    print(calConvOutSize(calConvOutSize(X.shape[2], filterSize_1), filterSize_2))
+    print(calPoolOutSize(calConvOutSize(calConvOutSize(X.shape[2], filterSize_1), filterSize_2), False))
+    pooloutSize = calPoolOutSize(calConvOutSize(calConvOutSize(X.shape[2], filterSize_1), filterSize_2), False)
+    densheight = int(num_filt2 * pooloutSize**2)
+
     ## Initializing all the parameters
-    f1, f2, w3, w4 = (num_filt1, X.shape[1], f, f), (num_filt2, num_filt1, f, f), (densSize, 300), (num_classes, densSize)
+    f1, f2, w3, w4 = (num_filt1, X.shape[1], filterSize_1, filterSize_1), (num_filt2, num_filt1, filterSize_2, filterSize_2), (densSize, densheight), (num_classes, densSize)
+
 
     f1 = initializeFilter(f1)
     f2 = initializeFilter(f2)
@@ -205,7 +231,7 @@ def train(num_classes = 10, img_dim = 28, f = 5, num_filt1 = 3, num_filt2 = 3):
     epochs = 50
 
     for epoch in range(epochs):
-        params, cost, paramsAdam = adamGD(X, Y, num_classes, img_dim, params, cost, paramsAdam)
+        params, cost, paramsAdam = adamGD(X, Y, num_classes, params, cost, paramsAdam)
         print(cost[-1])
         #t.set_description("Cost: %.2f" % (cost[-1]))
         #a = a + 1
