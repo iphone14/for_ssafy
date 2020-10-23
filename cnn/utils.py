@@ -1,10 +1,3 @@
-'''
-Description: Utility methods for a Convolutional Neural Network
-
-Author: Alejandro Escontrela
-Version: V.1.
-Date: June 12th, 2018
-'''
 from forward import *
 import numpy as np
 from PIL import Image
@@ -31,53 +24,16 @@ def getFileList(path):
 	return fileList
 
 
-def extractMNIST3(path):
-
-	fileList = getFileList(path)
-
-	X = []
-	Y = []
-
-	for fileInfo in fileList:
-
-		label = fileInfo['label']
-		name = fileInfo['name']
-
-		fileName = path + '/' + label + '/' + name
-		img = Image.open(fileName)
-
-		img1 = np.array(img).astype(np.float32).flatten()
-		img2 = np.array(img).astype(np.float32).flatten()
-		img3 = np.array(img).astype(np.float32).flatten()
-		img = np.append(img1, img2)
-		img = np.append(img, img3)
-
-		print('---')
-		print(img.shape)
-		print('xxx')
-
-		X.append(img)
-
-		Y.append(int(label))
-
-		M = np.array(X)
-
-		M = M.reshape(len(M), 3, 28, 28)
-
-	return np.array(img1), np.array(Y)
-
-	return M, np.array(Y)
-
-
-
-
-
 def extractMNIST(path):
 
 	fileList = getFileList(path)
 
+	colorDim = 1
+
 	X = []
 	Y = []
+
+	imgSize = 0
 
 	for fileInfo in fileList:
 
@@ -85,19 +41,21 @@ def extractMNIST(path):
 		name = fileInfo['name']
 
 		fileName = path + '/' + label + '/' + name
-		img = Image.open(fileName)
 
-		img = np.array(img).astype(np.float32).flatten()
+		img = np.array(Image.open(fileName)).astype(np.float32)
 
-		X.append(img)
+		imgSize = img.shape[0]
 
-		K = np.array(X)
+		list = []
 
-		K = K.reshape(len(K), 1, 28, 28)
+		for i in range(colorDim):
+			list = np.append(list, img.copy())
+
+		X.append(list)
 
 		Y.append(int(label))
 
-	return K, np.array(Y)
+	return np.array(X).reshape(len(X), colorDim, imgSize, imgSize), np.array(Y)
 
 
 def initializeFilter(size, scale = 1.0):
