@@ -14,8 +14,8 @@ if __name__ == '__main__':
     # Normalize the data
     X -= int(np.mean(X)) # subtract mean
     X /= int(np.std(X)) # divide by standard deviation
-    X = X.reshape(len(X), 1, 28, 28)
     
+
 
     corr = 0
     digit_count = [0 for i in range(10)]

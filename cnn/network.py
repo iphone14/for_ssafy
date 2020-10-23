@@ -91,14 +91,15 @@ def conv(image, label, params):
 ################### Optimization ####################
 #####################################################
 
-def adamGD(X, Y, num_classes, dim, n_c, params, cost, paramsAdam):
+def adamGD(X, Y, num_classes, dim, params, cost, paramsAdam):
 
     [f1, f2, w3, w4, b1, b2, b3, b4] = params
 
     [v1, v2, v3, v4, bv1, bv2, bv3, bv4] = paramsAdam
 
+    #print(X.shape)
     size = len(X)
-    X = X.reshape(size, n_c, dim, dim)
+    #X = X.reshape(size, n_c, dim, dim)
 
     cost_ = 0
 
@@ -192,7 +193,7 @@ def adamGD(X, Y, num_classes, dim, n_c, params, cost, paramsAdam):
 #####################################################
 ##################### Training ######################
 #####################################################
-def train(num_classes = 10, img_dim = 28, img_depth = 1, f = 5, num_filt1 = 3, num_filt2 = 3):
+def train(num_classes = 10, img_dim = 28, f = 5, num_filt1 = 3, num_filt2 = 3):
 
     X, Y = extractMNIST('./mnist/training')
 
@@ -201,8 +202,10 @@ def train(num_classes = 10, img_dim = 28, img_depth = 1, f = 5, num_filt1 = 3, n
 
     #train_data = np.hstack((X, y_dash))
 
+
+
     ## Initializing all the parameters
-    f1, f2, w3, w4 = (num_filt1 ,img_depth, f, f), (num_filt2 ,num_filt1,f,f), (128, 300), (10, 128)
+    f1, f2, w3, w4 = (num_filt1 ,X.shape[1], f, f), (num_filt2 ,num_filt1, f, f), (128, 300), (10, 128)
 
     f1 = initializeFilter(f1)
     f2 = initializeFilter(f2)
@@ -232,7 +235,7 @@ def train(num_classes = 10, img_dim = 28, img_depth = 1, f = 5, num_filt1 = 3, n
     epochs = 50
 
     for epoch in range(epochs):
-        params, cost, paramsAdam = adamGD(X, Y, num_classes, img_dim, img_depth, params, cost, paramsAdam)
+        params, cost, paramsAdam = adamGD(X, Y, num_classes, img_dim, params, cost, paramsAdam)
         print(cost[-1])
         #t.set_description("Cost: %.2f" % (cost[-1]))
         #a = a + 1
