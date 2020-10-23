@@ -40,6 +40,7 @@ def convolution(image, filt, bias, s):
 
     return out
 
+
 def maxpool(image, f=2, s=2):
     '''
     Downsample `image` using kernel size `f` and stride `s`

@@ -20,17 +20,8 @@ def conv(image, label, params):
 
     [f1, f2, w3, w4, b1, b2, b3, b4] = params
 
-    ################################################
-    ############## Forward Operation ###############
-    ################################################
-
-
-
     conv1 = convolution(image, f1, b1, conv_stride)
     conv1[conv1<=0] = 0 #ReLU
-
-    print('conv1', conv1.shape)
-    print('f1', f1.shape)
 
     conv2 = convolution(conv1, f2, b2, conv_stride)
     conv2[conv2<=0] = 0 #ReLU
@@ -75,9 +66,6 @@ def conv(image, label, params):
 
     return grads, loss
 
-#####################################################
-################### Optimization ####################
-#####################################################
 
 def adamGD(X, Y, num_classes, dim, params, cost, paramsAdam):
 
@@ -85,10 +73,7 @@ def adamGD(X, Y, num_classes, dim, params, cost, paramsAdam):
 
     [v1, v2, v3, v4, bv1, bv2, bv3, bv4] = paramsAdam
 
-    #print(X.shape)
     size = len(X)
-    #X = X.reshape(size, n_c, dim, dim)
-
     cost_ = 0
 
     # initialize gradients and momentum,RMS params
@@ -127,8 +112,6 @@ def adamGD(X, Y, num_classes, dim, params, cost, paramsAdam):
         cost_+= loss
 
     # Parameter Update
-
-
 
     #f1 -= (lr * (df1 / size))
     #b1 -= (lr * (db1 / size))
@@ -188,8 +171,11 @@ def train(num_classes = 10, img_dim = 28, f = 5, num_filt1 = 3, num_filt2 = 3):
     X-= int(np.mean(X))
     X/= int(np.std(X))
 
+
+    densSize = 128
+
     ## Initializing all the parameters
-    f1, f2, w3, w4 = (num_filt1, X.shape[1], f, f), (num_filt2, num_filt1, f, f), (128, 300), (10, 128)
+    f1, f2, w3, w4 = (num_filt1, X.shape[1], f, f), (num_filt2, num_filt1, f, f), (densSize, 300), (num_classes, densSize)
 
     f1 = initializeFilter(f1)
     f2 = initializeFilter(f2)
