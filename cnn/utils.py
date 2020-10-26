@@ -70,7 +70,7 @@ def nanargmax(arr):
     idxs = np.unravel_index(idx, arr.shape)
     return idxs
 
-def predict(image, f1, f2, w3, w4, b1, b2, b3, b4, conv_s = 1, pool_f = 2, pool_s = 2):
+def predict(image, f1, f2, w3, w4, w5, b1, b2, b3, b4, b5, conv_s = 1, pool_f = 2, pool_s = 2):
     '''
     Make predictions with trained filters/weights.
     '''
@@ -84,10 +84,12 @@ def predict(image, f1, f2, w3, w4, b1, b2, b3, b4, conv_s = 1, pool_f = 2, pool_
     (nf2, dim2, _) = pooled.shape
     fc = pooled.reshape((nf2 * dim2 * dim2, 1)) # flatten pooled layer
 
-    z = w3.dot(fc) + b3 # first dense layer
-    z[z<=0] = 0 # pass through ReLU non-linearity
 
-    out = w4.dot(z) + b4 # second dense layer
+    l = w3.dot(fc) + b3 # second dense layer
+    z = w4.dot(l) + b4 # second dense layer
+    out = w5.dot(z) + b5 # second dense layer
+
+
     probs = softmax(out) # predict class probabilities with the softmax activation function
 
     return np.argmax(probs), np.max(probs)

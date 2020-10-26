@@ -7,7 +7,7 @@ if __name__ == '__main__':
 
     params, cost = train()
 
-    [f1, f2, w3, w4, b1, b2, b3, b4] = params
+    [f1, f2, w3, w4, w5, b1, b2, b3, b4, b5] = params
 
     X, y = extractMNIST('./mnist/test')
 
@@ -25,7 +25,7 @@ if __name__ == '__main__':
     for i in t:
         x = X[i]
 
-        pred, prob = predict(x, f1, f2, w3, w4, b1, b2, b3, b4)
+        pred, prob = predict(x, f1, f2, w3, w4, w5, b1, b2, b3, b4, b5)
         digit_count[int(y[i])]+=1
 
         if pred==y[i]:
