@@ -1,5 +1,8 @@
 from abc import *
 import numpy as np
+import operator
+from functools import reduce
+
 
 class HiddenLayer(metaclass=ABCMeta):
 
@@ -18,6 +21,25 @@ class HiddenLayer(metaclass=ABCMeta):
     @abstractmethod
     def OutputShape(self):
             pass
+
+
+def tupleAdd(src1, src2):
+    return tuple(map(operator.add, src1, src2))
+
+def tupleSub(src1, src2):
+    return tuple(map(operator.sub, src1, src2))
+
+def tupleTrueDiv(src1, src2):
+    return tuple(map(operator.truediv, src1, src2))
+
+def tupleFloorDiv(src1, src2):
+    return tuple(map(operator.floordiv, src1, src2))
+
+def tupleMul(src1, src2):
+    return tuple(map(operator.mul, src1, src2))
+
+def tupleMul(src1, src2):
+    return tuple(map(operator.mul, src1, src2))
 
 
 class Convolution(HiddenLayer):
@@ -39,22 +61,20 @@ class Convolution(HiddenLayer):
         return conv1
 
     def Backward(self):
-        print('gege')
         return None
+
+    def paddingSize(self):
+        return tupleFloorDivDiv(tupleSub(self.kernel_size, (1, 1)), (2, 2)) if self.padding else (0, 0)
 
     def OutputShape(self):
 
-        padding_size = ((np.array(self.kernel_size) - 1) / 2) if self.padding else np.array((0, 0))
+        padding_size = self.paddingSize()
 
-        assert np.all(np.mod(padding_size, 1) == 0.0), "padding_size error"
+        numerator = tupleAdd(tupleSub(tupleMul(padding_size, (2, 2)), self.kernel_size), self.input_shape[-2:])
 
-        calc_shape = ((self.input_shape[-2:] + (padding_size*2) - self.kernel_size) / self.strides) + 1
+        calc_shape = tupleAdd(tupleFloorDiv(numerator, self.strides), (1, 1))
 
-        print(calc_shape)
-
-        output_shape = np.hstack([self.filters, calc_shape])
-
-        assert np.all(np.mod(output_shape, 1) == 0.0), "output_shape error"
+        output_shape = (self.filters,) + calc_shape
 
         return output_shape
 
@@ -81,11 +101,9 @@ class MaxPooling(HiddenLayer):
 
         cal_strides = self.pool_size if self.strides == None else self.strides
 
-        calc_shape = self.input_shape[-2:] / cal_strides
+        calc_shape = tupleFloorDiv(self.input_shape[-2:], cal_strides)
 
-        output_shape = np.hstack([self.input_shape[0], calc_shape])
-
-        assert np.all(np.mod(output_shape, 1) == 0.0), "output_shape error"
+        output_shape = (self.input_shape[0],) + calc_shape
 
         return output_shape
 
@@ -102,8 +120,7 @@ class Flatten(HiddenLayer):
         return None
 
     def OutputShape(self):
-
-        return [np.prod(self.input_shape)]
+        return (reduce(operator.mul, self.input_shape), )
 
 
 
@@ -125,8 +142,7 @@ class Dense(HiddenLayer):
 
     def OutputShape(self):
 
-        return [self.units]
-
+        return (self.units, )
 
 
 C1 = Convolution(filters=5, kernel_size=(3, 3), strides=(1, 1), padding=False, input_shape=(3, 28, 28))
