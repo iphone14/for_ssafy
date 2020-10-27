@@ -25,17 +25,10 @@ def conv(image, label, params):
     conv1 = convolution(image, f1, b1, conv_stride)
     conv1[conv1<=0] = 0 #ReLU
 
-    #print(conv1.shape)
-
     conv2 = convolution(conv1, f2, b2, conv_stride)
     conv2[conv2<=0] = 0 #ReLU
 
-    #print('c2', conv2.shape)
-
-
     pooled = maxpool(conv2, pool_size, pool_stride)
-
-    #print('pool', pooled.shape)
 
     fc = pooled.reshape((-1, 1)) # flatten
 
@@ -53,8 +46,6 @@ def conv(image, label, params):
     ############# Backward Operation ###############
     ################################################
     dout = probs - label # derivative of loss w.r.t. final dense layer output
-
-
 
     dw5 = dout.dot(l.T) # loss gradient of final dense layer weights
     db5 = np.sum(dout, axis = 1).reshape(b5.shape) # loss gradient of final dense layer biases
@@ -194,6 +185,7 @@ def adamGD(X, Y, num_classes, params, cost, paramsAdam):
     return params, cost, paramsAdam
 
 def calConvOutSize(height, filterSize):
+
     return ((height + (conv_padding*2) - filterSize) / conv_stride) + 1
 
 def calPoolOutSize(height, padding):
@@ -220,10 +212,12 @@ def train(num_classes = 10, num_filt1 = 5, num_filt2 = 5):
     print(calConvOutSize(calConvOutSize(X.shape[2], filterSize_1), filterSize_2))
     print(calPoolOutSize(calConvOutSize(calConvOutSize(X.shape[2], filterSize_1), filterSize_2), False))
     pooloutSize = calPoolOutSize(calConvOutSize(calConvOutSize(X.shape[2], filterSize_1), filterSize_2), False)
-    densheight = int(num_filt2 * pooloutSize**2)
 
-    ## Initializing all the parameters
-    f1, f2, w3, w4, w5 = (num_filt1, X.shape[1], filterSize_1, filterSize_1), (num_filt2, num_filt1, filterSize_2, filterSize_2), (densSize, densheight), (densheight, densSize), (num_classes, densheight)
+    densheight = int(num_filt2 * pooloutSize**2)
+    densSize2 = 64
+    densheight2 = int((num_filt2 * pooloutSize**2) / 2)
+
+    f1, f2, w3, w4, w5 = (num_filt1, X.shape[1], filterSize_1, filterSize_1), (num_filt2, num_filt1, filterSize_2, filterSize_2), (densSize, densheight), (densheight2, densSize), (num_classes, densheight2)
 
 
     f1 = initializeFilter(f1)
@@ -231,6 +225,7 @@ def train(num_classes = 10, num_filt1 = 5, num_filt2 = 5):
     w3 = initializeWeight(w3)
     w4 = initializeWeight(w4)
     w5 = initializeWeight(w5)
+
 
     b1 = np.zeros((f1.shape[0], 1))
     b2 = np.zeros((f2.shape[0], 1))
