@@ -41,11 +41,9 @@ class HiddenLayer(metaclass=ABCMeta):
 
 class Input(HiddenLayer):
 
-    def __init__(self):
+    def __init__(self, input_shape):
         super(Input, self).__init__(chain=None)
-
-    def setShape(self, shape):
-        self.input_shape = shape
+        self.input_shape = input_shape
 
     def Forward(self, input):
         print('input')
@@ -174,8 +172,7 @@ x-= int(np.mean(x))
 x/= int(np.std(x))
 
 
-I1 = Input()
-I1.setShape(x.shape[1:])
+I1 = Input(input_shape=x.shape[1:])
 
 C1 = Convolution(filters=5, kernel_size=(3, 3), strides=(1, 1), padding=False, chain=I1)
 C1_shape = C1.OutputShape()
@@ -224,6 +221,7 @@ for i in range(10):
 
         if next is None:
             break
+
         chain = next
 
 
