@@ -2,26 +2,7 @@ from abc import *
 import numpy as np
 import operator
 from functools import reduce
-
-
-def tupleAdd(src1, src2):
-    return tuple(map(operator.add, src1, src2))
-
-def tupleSub(src1, src2):
-    return tuple(map(operator.sub, src1, src2))
-
-def tupleTrueDiv(src1, src2):
-    return tuple(map(operator.truediv, src1, src2))
-
-def tupleFloorDiv(src1, src2):
-    return tuple(map(operator.floordiv, src1, src2))
-
-def tupleMul(src1, src2):
-    return tuple(map(operator.mul, src1, src2))
-
-def tupleMul(src1, src2):
-    return tuple(map(operator.mul, src1, src2))
-
+from utils import *
 
 
 
@@ -148,7 +129,12 @@ class Dense(HiddenLayer):
         return (self.units, )
 
 
-C1 = Convolution(filters=5, kernel_size=(3, 3), strides=(1, 1), padding=False, input_shape=(1, 28, 28))
+x, y = extractMNIST('./mnist/train')
+x-= int(np.mean(x))
+x/= int(np.std(x))
+
+
+C1 = Convolution(filters=5, kernel_size=(3, 3), strides=(1, 1), padding=False, input_shape=x.shape[1:])
 C1_shape = C1.OutputShape()
 print(C1_shape)
 
@@ -162,7 +148,7 @@ print(MP1_shape)
 
 F1 = Flatten(input_shape=MP1_shape)
 F1_shape = F1.OutputShape()
-print(F1_shape, '-faltten')
+print(F1_shape)
 
 
 D1 = Dense(units=128, input_shape=F1_shape)
