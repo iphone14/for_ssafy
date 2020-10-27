@@ -18,21 +18,20 @@ class HiddenLayer(metaclass=ABCMeta):
             self.input_shape = chain.OutputShape()
             chain.forwardChain = self
 
-    @abstractmethod
-    def PassForward(self):
-        pass
 
-    @abstractmethod
-    def PassBackward(self):
-        pass
-
-    def Forward(self):
-        self.PassForward()
+    def ForwardChain(self):
         return self.forwardChain
 
-    def Backward(self):
-        self.PassBackward()
+    def BackwardChain(self):
         return self.backwardChain
+
+    @abstractmethod
+    def Forward(self, input):
+        pass
+
+    @abstractmethod
+    def Backward(self, input):
+        pass
 
     @abstractmethod
     def OutputShape(self):
@@ -48,11 +47,13 @@ class Input(HiddenLayer):
     def setShape(self, shape):
         self.input_shape = shape
 
-    def PassForward(self):
+    def Forward(self, input):
         print('input')
+        return None
 
-    def PassBackward(self):
+    def Backward(self, input):
         print('back input')
+        return None
 
     def OutputShape(self):
         return self.input_shape
@@ -75,11 +76,13 @@ class Convolution(HiddenLayer):
         stddev = scale/np.sqrt(np.prod(size))
         return np.random.normal(loc = 0, scale = stddev, size = size)
 
-    def PassForward(self):
+    def Forward(self, input):
         print('conv')
+        return None
 
-    def PassBackward(self):
+    def Backward(self, input):
         print('back conv')
+        return None
 
     def paddingSize(self):
         return tupleFloorDivDiv(tupleSub(self.kernel_size, (1, 1)), (2, 2)) if self.padding else (0, 0)
@@ -105,11 +108,13 @@ class MaxPooling(HiddenLayer):
         self.pool_size = pool_size
         self.strides = strides
 
-    def PassForward(self):
-        print('pool')
+    def Forward(self, input):
+        print('max')
+        return None
 
-    def PassBackward(self):
-        print('back pool')
+    def Backward(self, input):
+        print('back max')
+        return None
 
     def OutputShape(self):
 
@@ -127,11 +132,13 @@ class Flatten(HiddenLayer):
     def __init__(self, chain):
         super(Flatten, self).__init__(chain)
 
-    def PassForward(self):
+    def Forward(self, input):
         print('flatten')
+        return None
 
-    def PassBackward(self):
+    def Backward(self, input):
         print('back flatten')
+        return None
 
     def OutputShape(self):
         return (reduce(operator.mul, self.input_shape), )
@@ -150,11 +157,13 @@ class Dense(HiddenLayer):
     def initWeight(self, size):
         return np.random.standard_normal(size=size) * 0.01
 
-    def PassForward(self):
+    def Forward(self, input):
         print('dense')
+        return None
 
-    def PassBackward(self):
+    def Backward(self, input):
         print('back dense')
+        return None
 
     def OutputShape(self):
         return (self.units, )
@@ -202,19 +211,31 @@ print(D3_shape)
 
 chain = I1
 
+output = x
+
 
 for i in range(10):
 
     while True:
-        next = chain.Forward()
+
+        output = chain.Forward(output)
+
+        next = chain.ForwardChain()
 
         if next is None:
             break
         chain = next
 
 
+    #error = output - y
+    error = output
+
+
     while True:
-        next = chain.Backward()
+
+        error = chain.Backward(error)
+
+        next = chain.BackwardChain()
 
         if next is None:
             break
