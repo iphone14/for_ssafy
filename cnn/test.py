@@ -4,25 +4,6 @@ import operator
 from functools import reduce
 
 
-class HiddenLayer(metaclass=ABCMeta):
-
-    @abstractmethod
-    def __init__(self, input_shape):
-        self.input_shape = input_shape
-
-    @abstractmethod
-    def Forward(self):
-        pass
-
-    @abstractmethod
-    def Backward(self):
-        pass
-
-    @abstractmethod
-    def OutputShape(self):
-            pass
-
-
 def tupleAdd(src1, src2):
     return tuple(map(operator.add, src1, src2))
 
@@ -42,6 +23,27 @@ def tupleMul(src1, src2):
     return tuple(map(operator.mul, src1, src2))
 
 
+
+
+class HiddenLayer(metaclass=ABCMeta):
+
+    @abstractmethod
+    def __init__(self, input_shape):
+        self.input_shape = input_shape
+
+    @abstractmethod
+    def Forward(self):
+        pass
+
+    @abstractmethod
+    def Backward(self):
+        pass
+
+    @abstractmethod
+    def OutputShape(self):
+            pass
+
+
 class Convolution(HiddenLayer):
 
     def __init__(self, filters, kernel_size, strides, padding, input_shape):
@@ -52,11 +54,14 @@ class Convolution(HiddenLayer):
         self.strides = strides
         self.padding = padding
 
-        self.wieght = 1
-        self.bias = 1
+        self.weight = self.initWeight((filters, input_shape[0], kernel_size[0], kernel_size[1]))
+        self.bias = np.zeros((filters, 1))
+
+    def initWeight(self, size, scale = 1.0):
+        stddev = scale/np.sqrt(np.prod(size))
+        return np.random.normal(loc = 0, scale = stddev, size = size)
 
     def Forward(self):
-
         conv1 = 1
         return conv1
 
@@ -79,7 +84,6 @@ class Convolution(HiddenLayer):
         return output_shape
 
 
-
 class MaxPooling(HiddenLayer):
 
     def __init__(self, pool_size, strides, input_shape):
@@ -87,9 +91,6 @@ class MaxPooling(HiddenLayer):
 
         self.pool_size = pool_size
         self.strides = strides
-
-        self.wieght = 1
-        self.bias = 1
 
     def Forward(self):
         return None
@@ -131,8 +132,11 @@ class Dense(HiddenLayer):
 
         self.units = units
 
-        self.wieght = 1
-        self.bias = 1
+        self.wieght = self.initWeight((units, input_shape[0]))
+        self.bias = np.zeros((units, 1))
+
+    def initWeight(self, size):
+        return np.random.standard_normal(size=size) * 0.01
 
     def Forward(self):
         return None
@@ -141,11 +145,10 @@ class Dense(HiddenLayer):
         return None
 
     def OutputShape(self):
-
         return (self.units, )
 
 
-C1 = Convolution(filters=5, kernel_size=(3, 3), strides=(1, 1), padding=False, input_shape=(3, 28, 28))
+C1 = Convolution(filters=5, kernel_size=(3, 3), strides=(1, 1), padding=False, input_shape=(1, 28, 28))
 C1_shape = C1.OutputShape()
 print(C1_shape)
 
