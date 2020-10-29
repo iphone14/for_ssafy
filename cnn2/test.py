@@ -83,15 +83,20 @@ class Convolution(HiddenLayer):
         return None
 
     def paddingSize(self):
-        return tupleFloorDivDiv(tupleSub(self.kernel_size, (1, 1)), (2, 2)) if self.padding else (0, 0)
+
+        if self.padding == True:
+            return ((self.kernel_size[0] - 1) // 2, (self.kernel_size[1] - 1) // 2)
+        else:
+            return (0,0)
 
     def OutputShape(self):
 
         padding_size = self.paddingSize()
 
-        numerator = tupleAdd(tupleSub(tupleMul(padding_size, (2, 2)), self.kernel_size), self.input_shape[-2:])
+        numerator_X = ((padding_size[0] * 2) - self.kernel_size[0]) + self.input_shape[1]
+        numerator_Y = ((padding_size[1] * 2) - self.kernel_size[1]) + self.input_shape[2]
 
-        calc_shape = tupleAdd(tupleFloorDiv(numerator, self.strides), (1, 1))
+        calc_shape = ((numerator_X // self.strides[0]) + 1, (numerator_Y // self.strides[1]) + 1)
 
         output_shape = (self.filters,) + calc_shape
 
@@ -118,7 +123,7 @@ class MaxPooling(HiddenLayer):
 
         cal_strides = self.pool_size if self.strides == None else self.strides
 
-        calc_shape = tupleFloorDiv(self.input_shape[-2:], cal_strides)
+        calc_shape = ((self.input_shape[1] // cal_strides[0]), (self.input_shape[2] // cal_strides[1]))
 
         output_shape = (self.input_shape[0],) + calc_shape
 
@@ -211,7 +216,7 @@ chain = I1
 output = x
 
 
-for i in range(10):
+for i in range(1):
 
     while True:
 

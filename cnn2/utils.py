@@ -56,23 +56,3 @@ def extractMNIST(path):
 		Y.append(int(label))
 
 	return np.array(X).reshape(len(X), colorDim, imgSize, imgSize), np.array(Y)
-
-
-
-def tupleAdd(src1, src2):
-    return tuple(map(operator.add, src1, src2))
-
-def tupleSub(src1, src2):
-    return tuple(map(operator.sub, src1, src2))
-
-def tupleTrueDiv(src1, src2):
-    return tuple(map(operator.truediv, src1, src2))
-
-def tupleFloorDiv(src1, src2):
-    return tuple(map(operator.floordiv, src1, src2))
-
-def tupleMul(src1, src2):
-    return tuple(map(operator.mul, src1, src2))
-
-def tupleMul(src1, src2):
-    return tuple(map(operator.mul, src1, src2))
