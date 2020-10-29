@@ -6,7 +6,6 @@ from utils import *
 from gradient import *
 from layer import *
 
-
 gradient = Adam(lr=0.001, batches=100, beta1=0.95, beta2=0.95)
 
 x, y = extractMNIST('./mnist/train')
@@ -16,7 +15,7 @@ x/= int(np.std(x))
 
 I1 = Input(input_shape=x.shape[1:])
 
-C1 = Convolution(filters=5, kernel_size=(3, 3), strides=(1, 1), padding=True, chain=I1, gradient=gradient.copy())
+C1 = Convolution(filters=5, kernel_size=(3, 3), strides=(1, 1), padding=False, chain=I1, gradient=gradient.copy())
 C1_shape = C1.outputShape()
 print(C1_shape)
 
@@ -60,6 +59,13 @@ output = x[0]
 output = chain.forward(output)
 chain = chain.forwardChain()
 
+print('^^^^', output, '^^^^')
+output = chain.forward(output)
+print('---', output.shape, '------')
+print(output)
+
+chain = chain.forwardChain()
+
 print(output)
 output = chain.forward(output)
 print('---', output.shape, '------')
@@ -67,9 +73,14 @@ print(output)
 
 chain = chain.forwardChain()
 
-
+print(output)
+output = chain.forward(output)
+print('---', output.shape, '------')
+print(output)
 
 """
+
+
 
 chain =  I1
 

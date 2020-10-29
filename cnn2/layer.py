@@ -62,7 +62,7 @@ class Convolution(Layer):
         super(Convolution, self).__init__(chain)
 
         self.strides = strides
-        self.padding = padding
+        self.padding_size = self.paddingSize(kernel_size[0], kernel_size[1]) if padding else (0,0)
 
         self.weight = self.initWeight((filters, self.input_shape[0], kernel_size[0], kernel_size[1]))
         self.bias = np.zeros((filters, 1))
@@ -70,12 +70,14 @@ class Convolution(Layer):
         self.gradient = gradient
 
     def initWeight(self, size, scale = 1.0):
+
         stddev = scale/np.sqrt(np.prod(size))
         return np.random.normal(loc = 0, scale = stddev, size = size)
 
     def appendPadding(self, input):
 
-        size = self.paddingSize()
+        size = self.padding_size
+
         rows = []
         for i in input:
             rows.append(np.pad(i, ((size[0], size[0]),(size[1], size[1])), 'constant', constant_values=0))
@@ -84,14 +86,13 @@ class Convolution(Layer):
 
     def forward(self, input):
 
-        if self.padding == True:
-            input = self.appendPadding(input)
+        input = self.appendPadding(input)
 
         (filters, colors, kernel_height, kernel_width) = self.weight.shape
         (input_colors, input_height, input_width) = input.shape
         (stride_y, stride_x) = self.strides
 
-        assert colors == input_colors, "filter miss matchh"
+        assert colors == input_colors, "filter miss match"
 
         output = np.zeros(self.outputShape())
 
@@ -115,28 +116,21 @@ class Convolution(Layer):
         print('back conv')
         return None
 
-    def paddingSize(self):
-
-        kernel_height = self.weight.shape[2]
-        kernel_width = self.weight.shape[3]
+    def paddingSize(self, kernel_height, kernel_width):
 
         return ((kernel_height - 1) // 2, (kernel_width - 1) // 2)
 
     def outputShape(self):
 
-        padding_size = self.paddingSize() if self.padding else (0,0)
-
         (filters, colors, kernel_height, kernel_width) = self.weight.shape
         (stride_y, stride_x) = self.strides
 
-        numerator_height = ((padding_size[0] * 2) - kernel_height) + self.input_shape[1]
-        numerator_width = ((padding_size[1] * 2) - kernel_width) + self.input_shape[2]
+        numerator_height = ((self.padding_size[0] * 2) - kernel_height) + self.input_shape[1]
+        numerator_width = ((self.padding_size[1] * 2) - kernel_width) + self.input_shape[2]
 
         calc_shape = ((numerator_height // stride_y) + 1, (numerator_width // stride_x) + 1)
 
-        output_shape = (filters,) + calc_shape
-
-        return output_shape
+        return (filters,) + calc_shape
 
 
 class MaxPooling(Layer):
@@ -145,11 +139,31 @@ class MaxPooling(Layer):
         super(MaxPooling, self).__init__(chain)
 
         self.pool_size = pool_size
-        self.strides = strides
+        self.strides = pool_size if strides == None else strides
 
     def forward(self, input):
-        print('max')
-        return None
+
+        (input_colors, input_height, input_width) = input.shape
+        (pool_height, pool_width) = self.pool_size
+        (stride_y, stride_x) = self.strides
+
+        height = int(input_height // stride_y)
+        width = int(input_width // stride_x)
+
+        output = np.zeros((input_colors, height, width))
+
+        for color in range(input_colors):
+            y = out_y = 0
+            while (y + pool_height) <= input_height:
+                x = out_x = 0
+                while (x + pool_width) <= input_width:
+                    output[color, out_y, out_x] = np.max(input[color, y:y + stride_y, x:x + stride_x])
+                    x += stride_x
+                    out_x += 1
+                y += stride_y
+                out_y += 1
+
+        return output
 
     def backward(self, error):
         print('back max')
@@ -157,13 +171,9 @@ class MaxPooling(Layer):
 
     def outputShape(self):
 
-        cal_strides = self.pool_size if self.strides == None else self.strides
+        calc_shape = ((self.input_shape[1] // self.strides[0]), (self.input_shape[2] // self.strides[1]))
 
-        calc_shape = ((self.input_shape[1] // cal_strides[0]), (self.input_shape[2] // cal_strides[1]))
-
-        output_shape = (self.input_shape[0],) + calc_shape
-
-        return output_shape
+        return (self.input_shape[0],) + calc_shape
 
 
 class Flatten(Layer):
