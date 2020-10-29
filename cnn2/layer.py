@@ -56,11 +56,6 @@ class Input(Layer):
 
 
 
-
-
-
-
-
 class Convolution(Layer):
 
     def __init__(self, filters, kernel_size, strides, padding, chain, gradient):
@@ -92,9 +87,9 @@ class Convolution(Layer):
         if self.padding == True:
             input = self.appendPadding(input)
 
-        (filters, colors, kernel_width, kernel_height) = self.weight.shape
-        (input_colors, input_width, input_height) = input.shape
-        (stride_width, stride_height) = self.strides
+        (filters, colors, kernel_height, kernel_width) = self.weight.shape
+        (input_colors, input_height, input_width) = input.shape
+        (stride_y, stride_x) = self.strides
 
         assert colors == input_colors, "filter miss matchh"
 
@@ -105,11 +100,11 @@ class Convolution(Layer):
             while (y + kernel_height) <= input_height:
                 x = out_x = 0
                 while (x + kernel_width) <= input_width:
-                    output[filter, out_x, out_y] = np.sum(self.weight[filter] * input[:, x:x + kernel_width, y:y + kernel_height]) + self.bias[filter]
-                    x += stride_width
+                    output[filter, out_y, out_x] = np.sum(self.weight[filter] * input[:, y:y + kernel_height, x:x + kernel_width]) + self.bias[filter]
+                    x += stride_x
                     out_x += 1
 
-                y += stride_height
+                y += stride_y
                 out_y += 1
 
         output[output<=0] = 0
@@ -122,22 +117,22 @@ class Convolution(Layer):
 
     def paddingSize(self):
 
-        kernel_width = self.weight.shape[2]
-        kernel_height = self.weight.shape[3]
+        kernel_height = self.weight.shape[2]
+        kernel_width = self.weight.shape[3]
 
-        return ((kernel_width - 1) // 2, (kernel_height - 1) // 2)
+        return ((kernel_height - 1) // 2, (kernel_width - 1) // 2)
 
     def outputShape(self):
 
         padding_size = self.paddingSize() if self.padding else (0,0)
 
-        (filters, colors, kernel_width, kernel_height) = self.weight.shape
-        (stride_width, stride_height) = self.strides
+        (filters, colors, kernel_height, kernel_width) = self.weight.shape
+        (stride_y, stride_x) = self.strides
 
-        numerator_width = ((padding_size[0] * 2) - kernel_width) + self.input_shape[1]
-        numerator_height = ((padding_size[1] * 2) - kernel_width) + self.input_shape[2]
+        numerator_height = ((padding_size[0] * 2) - kernel_height) + self.input_shape[1]
+        numerator_width = ((padding_size[1] * 2) - kernel_width) + self.input_shape[2]
 
-        calc_shape = ((numerator_width // stride_width) + 1, (numerator_height // stride_height) + 1)
+        calc_shape = ((numerator_height // stride_y) + 1, (numerator_width // stride_x) + 1)
 
         output_shape = (filters,) + calc_shape
 

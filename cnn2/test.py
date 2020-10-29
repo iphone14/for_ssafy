@@ -16,7 +16,7 @@ x/= int(np.std(x))
 
 I1 = Input(input_shape=x.shape[1:])
 
-C1 = Convolution(filters=5, kernel_size=(3, 3), strides=(1, 1), padding=False, chain=I1, gradient=gradient.copy())
+C1 = Convolution(filters=5, kernel_size=(3, 3), strides=(1, 1), padding=True, chain=I1, gradient=gradient.copy())
 C1_shape = C1.outputShape()
 print(C1_shape)
 
@@ -54,7 +54,8 @@ D3_shape = D3.outputShape()
 print(D3_shape)
 
 
-chain =  I1
+chain = I1
+print(y[0])
 output = x[0]
 output = chain.forward(output)
 chain = chain.forwardChain()
