@@ -55,13 +55,17 @@ class Input(Layer):
         return self.input_shape
 
 
+
+
+
+
+
+
 class Convolution(Layer):
 
     def __init__(self, filters, kernel_size, strides, padding, chain, gradient):
         super(Convolution, self).__init__(chain)
 
-        self.filters = filters
-        self.kernel_size = kernel_size
         self.strides = strides
         self.padding = padding
 
@@ -74,36 +78,43 @@ class Convolution(Layer):
         stddev = scale/np.sqrt(np.prod(size))
         return np.random.normal(loc = 0, scale = stddev, size = size)
 
+    def appendPadding(self, input):
+
+        size = self.paddingSize()
+        rows = []
+        for i in input:
+            rows.append(np.pad(i, ((size[0], size[0]),(size[1], size[1])), 'constant', constant_values=0))
+
+        return np.array(rows)
+
     def forward(self, input):
 
-        
+        if self.padding == True:
+            input = self.appendPadding(input)
 
-        print('conv')
-        print(input.shape)
+        (filters, colors, kernel_width, kernel_height) = self.weight.shape
+        (input_colors, input_width, input_height) = input.shape
+        (stride_width, stride_height) = self.strides
 
-        (n_f, n_c_f, f, _) = self.weight.shape # filter dimensions
-        n_c, in_dim, _ = input.shape # image dimensions
+        assert colors == input_colors, "filter miss matchh"
 
-        #n_c = color depth example filter = 1
-        out_dim = int((in_dim - f) / self.strides[0]) + 1 # calculate output dimensions
+        output = np.zeros(self.outputShape())
 
-        assert n_c == n_c_f, "Dimensions of filter must match dimensions of input image"
-
-        out = np.zeros((n_f, out_dim, out_dim))
-
-        for curr_f in range(n_f):
-            curr_y = out_y = 0
-            while curr_y + f <= in_dim:
-                curr_x = out_x = 0
-
-                while curr_x + f <= in_dim:
-                    out[curr_f, out_y, out_x] = np.sum(self.weight[curr_f] * input[:,curr_y:curr_y+f, curr_x:curr_x + f]) + self.bias[curr_f]
-                    curr_x += self.strides[0]
+        for filter in range(filters):
+            y = out_y = 0
+            while (y + kernel_height) <= input_height:
+                x = out_x = 0
+                while (x + kernel_width) <= input_width:
+                    output[filter, out_x, out_y] = np.sum(self.weight[filter] * input[:, x:x + kernel_width, y:y + kernel_height]) + self.bias[filter]
+                    x += stride_width
                     out_x += 1
-                curr_y += self.strides[1]
+
+                y += stride_height
                 out_y += 1
 
-        return out
+        output[output<=0] = 0
+
+        return output
 
     def backward(self, input):
         print('back conv')
@@ -111,21 +122,24 @@ class Convolution(Layer):
 
     def paddingSize(self):
 
-        if self.padding == True:
-            return ((self.kernel_size[0] - 1) // 2, (self.kernel_size[1] - 1) // 2)
-        else:
-            return (0,0)
+        kernel_width = self.weight.shape[2]
+        kernel_height = self.weight.shape[3]
+
+        return ((kernel_width - 1) // 2, (kernel_height - 1) // 2)
 
     def outputShape(self):
 
-        padding_size = self.paddingSize()
+        padding_size = self.paddingSize() if self.padding else (0,0)
 
-        numerator_X = ((padding_size[0] * 2) - self.kernel_size[0]) + self.input_shape[1]
-        numerator_Y = ((padding_size[1] * 2) - self.kernel_size[1]) + self.input_shape[2]
+        (filters, colors, kernel_width, kernel_height) = self.weight.shape
+        (stride_width, stride_height) = self.strides
 
-        calc_shape = ((numerator_X // self.strides[0]) + 1, (numerator_Y // self.strides[1]) + 1)
+        numerator_width = ((padding_size[0] * 2) - kernel_width) + self.input_shape[1]
+        numerator_height = ((padding_size[1] * 2) - kernel_width) + self.input_shape[2]
 
-        output_shape = (self.filters,) + calc_shape
+        calc_shape = ((numerator_width // stride_width) + 1, (numerator_height // stride_height) + 1)
+
+        output_shape = (filters,) + calc_shape
 
         return output_shape
 

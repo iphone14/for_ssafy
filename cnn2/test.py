@@ -58,8 +58,12 @@ chain =  I1
 output = x[0]
 output = chain.forward(output)
 chain = chain.forwardChain()
+
+print(output)
 output = chain.forward(output)
-print(output.shape)
+print('---', output.shape, '------')
+print(output)
+
 chain = chain.forwardChain()
 
 
