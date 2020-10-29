@@ -75,8 +75,35 @@ class Convolution(Layer):
         return np.random.normal(loc = 0, scale = stddev, size = size)
 
     def forward(self, input):
+
+        
+
         print('conv')
-        return None
+        print(input.shape)
+
+        (n_f, n_c_f, f, _) = self.weight.shape # filter dimensions
+        n_c, in_dim, _ = input.shape # image dimensions
+
+        #n_c = color depth example filter = 1
+        out_dim = int((in_dim - f) / self.strides[0]) + 1 # calculate output dimensions
+
+        assert n_c == n_c_f, "Dimensions of filter must match dimensions of input image"
+
+        out = np.zeros((n_f, out_dim, out_dim))
+
+        for curr_f in range(n_f):
+            curr_y = out_y = 0
+            while curr_y + f <= in_dim:
+                curr_x = out_x = 0
+
+                while curr_x + f <= in_dim:
+                    out[curr_f, out_y, out_x] = np.sum(self.weight[curr_f] * input[:,curr_y:curr_y+f, curr_x:curr_x + f]) + self.bias[curr_f]
+                    curr_x += self.strides[0]
+                    out_x += 1
+                curr_y += self.strides[1]
+                out_y += 1
+
+        return out
 
     def backward(self, input):
         print('back conv')

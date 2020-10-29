@@ -55,11 +55,11 @@ print(D3_shape)
 
 
 chain =  I1
-output = x
+output = x[0]
 output = chain.forward(output)
 chain = chain.forwardChain()
-
 output = chain.forward(output)
+print(output.shape)
 chain = chain.forwardChain()
 
 
