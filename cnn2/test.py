@@ -5,6 +5,25 @@ from functools import reduce
 from utils import *
 
 
+class Gradient(metaclass=ABCMeta):
+
+    @abstractmethod
+    def __init__(self, lr, batches):
+        self.batches = batches
+        self.lr = lr
+
+    @abstractmethod
+    def Copy(self):
+        pass
+
+
+class Adam(Gradient):
+    def __init__(self, lr, batches, beta1, beta2):
+        super(Adam, self).__init__(lr, batches)
+        self.beta1 = beta1
+        self.beta2 = beta2
+
+
 class HiddenLayer(metaclass=ABCMeta):
 
     @abstractmethod
@@ -17,7 +36,6 @@ class HiddenLayer(metaclass=ABCMeta):
         if chain is not None:
             self.input_shape = chain.OutputShape()
             chain.forwardChain = self
-
 
     def ForwardChain(self):
         return self.forwardChain
