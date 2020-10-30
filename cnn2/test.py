@@ -22,7 +22,7 @@ def forward(head, output):
 
         output = chain.forward(output)
 
-        print(output)
+        #print(output)
 
         next = chain.forwardChain()
 
@@ -48,6 +48,21 @@ def backward(tail, error):
 
         chain = next
 
+
+def updateGradient(head):
+
+    chain = head
+
+    while True:
+
+        chain.updateGradient()
+
+        next = chain.forwardChain()
+
+        if next is None:
+            break
+
+        chain = next
 
 
 I1 = Input(input_shape=x.shape[1:])
@@ -86,8 +101,49 @@ D3 = Dense(units=10, activation='softmax', chain=D2, gradient=gradient.copy())
 D3_shape = D3.outputShape()
 print(D3_shape)
 
-classes = 10
 
+
+def batchTrain(head, tail, x, y):
+
+    batches = len(x)
+
+    classes = 10
+
+    loss = 0
+
+    for i in range(batches):
+
+        output = forward(head, x[i])
+
+        #print('----forward')
+
+        onehot = labelToOnehot(y[i], classes)
+
+        loss += categoricalCrossEntropy(output, onehot)
+
+        error = output - onehot
+
+        #print('----backward')
+
+        backward(tail, error)
+
+        #print(i)
+
+    print('loss : ', loss / batches)
+
+    updateGradient(tail)
+
+
+
+
+
+epochs = 0
+
+while epochs <= 100:
+    batchTrain(I1, D3, x, y)
+    epochs += 1
+
+"""
 
 output = forward(I1, x[0])
 
@@ -101,8 +157,10 @@ error = output - onehot
 
 backward(D3, error)
 
+updateGradient(D3)
 
-"""
+
+
 
 
 print(y[0])

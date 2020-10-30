@@ -145,9 +145,13 @@ def adamGD(X, Y, num_classes, params, cost, paramsAdam):
     lr = 0.001
     beta1 = 0.95
 
+    print(size)
+    print(dw3)
+
 
     v1 = beta1 * v1 + (1 - beta1) * (df1 / size)**2
     f1 -= lr * (df1 / size)/(np.sqrt(v1) + 1e-7)
+
 
     bv1 = beta1 * bv1 + (1 - beta1) * (db1 / size)**2
     b1 -= lr * (db1 / size)/(np.sqrt(bv1) + 1e-7)

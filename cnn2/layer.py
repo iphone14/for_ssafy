@@ -50,7 +50,7 @@ class Input(Layer):
         self.input_shape = input_shape
 
     def forward(self, input):
-        print('input')
+        #print('input')
         return input
 
     def backward(self, error):
@@ -76,6 +76,7 @@ class Convolution(Layer):
         self.bias = np.zeros((filters, 1))
 
         self.gradient = gradient
+        self.gradient.setShape(self.weight.shape, self.bias.shape)
 
         self.last_output = None
         self.input = None
@@ -99,7 +100,7 @@ class Convolution(Layer):
 
         input = self.appendPadding(input)
 
-        self.input = input
+        self.input = input.copy()
 
         (filters, colors, kernel_height, kernel_width) = self.weight.shape
         (input_colors, input_height, input_width) = input.shape
@@ -123,7 +124,7 @@ class Convolution(Layer):
 
         output[output<=0] = 0
 
-        self.last_output = output
+        self.last_output = output.copy()
 
         return output
 
@@ -137,7 +138,7 @@ class Convolution(Layer):
 
         output = np.zeros(self.input.shape)
         grain_weight = np.zeros(self.weight.shape)
-        grain_bias = np.zeros((filters, 1))
+        grain_bias = np.zeros(self.bias.shape)
 
         for filter in range(filters):
             y = out_y = 0
@@ -174,8 +175,8 @@ class Convolution(Layer):
         return (filters,) + calc_shape
 
     def updateGradient(self):
-        self.weight += self.gradient.deltaWeight()
-        self.bias += self.gradient.deltaBias()
+        self.weight -= self.gradient.deltaWeight()
+        self.bias -= self.gradient.deltaBias()
         self.gradient.reset()
 
 
@@ -190,7 +191,7 @@ class MaxPooling(Layer):
 
     def forward(self, input):
 
-        self.input = input
+        self.input = input.copy()
 
         (input_colors, input_height, input_width) = input.shape
         (pool_height, pool_width) = self.pool_size
@@ -282,37 +283,39 @@ class Dense(Layer):
         self.units = units
         self.activation = activation
 
-        self.wieght = self.initWeight((units, self.input_shape[0]))
+        self.weight = self.initWeight((units, self.input_shape[0]))
         self.bias = np.zeros((units, 1))
 
         self.input = None
         self.last_output = None
 
         self.gradient = gradient
+        self.gradient.setShape(self.weight.shape, self.bias.shape)
 
     def initWeight(self, size):
         return np.random.standard_normal(size=size) * 0.01
 
     def forward(self, input):
 
-        self.input = input
+        self.input = input.copy()
 
-        output =  self.wieght.dot(input) + self.bias
+        output = self.weight.dot(input) + self.bias
 
         if self.activation == 'softmax':
             output = np.exp(output)
-            self.last_output = output/np.sum(output)
+            output = output/np.sum(output)
         elif self.activation == 'relu':
             output[output<=0] = 0
-            self.last_output = output
-        else:   # linear
-            self.last_output = output
+        #else:   # linear
+            #self.last_output = output
 
-        return self.last_output
+        self.last_output = output.copy()
+
+        return output
 
     def backward(self, error):
 
-        #if self.activation == 'relu'
+        #if self.activation == 'linear':
             #error[self.input <= 0] = 0
 
         grain_weight = error.dot(self.input.T)
@@ -320,7 +323,8 @@ class Dense(Layer):
 
         self.gradient.put(grain_weight, grain_bias)
 
-        backward_chain_error = self.wieght.T.dot(error)
+        backward_chain_error = self.weight.T.dot(error)
+        backward_chain_error[self.input <= 0] = 0
 
         return backward_chain_error
 
@@ -328,6 +332,8 @@ class Dense(Layer):
         return (self.units, )
 
     def updateGradient(self):
-        self.weight += self.gradient.deltaWeight()
-        self.bias += self.gradient.deltaBias()
+
+        #print(self.gradient.deltaWeight())
+        self.weight -= self.gradient.deltaWeight()
+        self.bias -= self.gradient.deltaBias()
         self.gradient.reset()
