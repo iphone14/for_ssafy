@@ -145,6 +145,11 @@ class Convolution(Layer):
         pass
 
 
+
+
+
+
+
 class MaxPooling(Layer):
 
     def __init__(self, pool_size, strides, chain):
@@ -152,8 +157,11 @@ class MaxPooling(Layer):
 
         self.pool_size = pool_size
         self.strides = pool_size if strides == None else strides
+        self.input = None
 
     def forward(self, input):
+
+        self.input = input
 
         (input_colors, input_height, input_width) = input.shape
         (pool_height, pool_width) = self.pool_size
@@ -169,7 +177,7 @@ class MaxPooling(Layer):
             while (y + pool_height) <= input_height:
                 x = out_x = 0
                 while (x + pool_width) <= input_width:
-                    output[color, out_y, out_x] = np.max(input[color, y:y + stride_y, x:x + stride_x])
+                    output[color, out_y, out_x] = np.max(input[color, y:y + pool_height, x:x + pool_width])
                     x += stride_x
                     out_x += 1
                 y += stride_y
@@ -177,9 +185,31 @@ class MaxPooling(Layer):
 
         return output
 
+    def nanargmax(self, array):
+        idx = np.nanargmax(array)
+        return np.unravel_index(idx, array.shape)
+
     def backward(self, error):
-        print('back max')
-        return None
+
+        (input_colors, input_height, input_width) = self.input.shape
+        (pool_height, pool_width) = self.pool_size
+        (stride_y, stride_x) = self.strides
+
+        output = np.zeros(self.input.shape)
+
+        for color in range(input_colors):
+            y = out_y = 0
+            while (y + pool_height) <= input_height:
+                x = out_x = 0
+                while (x + pool_width) <= input_width:
+                    (a, b) = self.nanargmax(self.input[color, y:y + pool_height, x:x + pool_width])
+                    output[color, y + a, x + b] = error[color, out_y, out_x]
+                    x += stride_x
+                    out_x += 1
+                y += stride_y
+                out_y += 1
+
+        return output
 
     def outputShape(self):
 
@@ -192,6 +222,9 @@ class MaxPooling(Layer):
         pass
 
 
+
+
+
 class Flatten(Layer):
 
     def __init__(self, chain):
@@ -201,14 +234,16 @@ class Flatten(Layer):
         return input.reshape((-1, 1))
 
     def backward(self, error):
-        print('back flatten')
-        return None
+        return error.reshape(self.input_shape)
 
     def outputShape(self):
         return (reduce(operator.mul, self.input_shape), )
 
     def updateGradient(self):
         pass
+
+
+
 
 
 class Dense(Layer):
@@ -252,7 +287,7 @@ class Dense(Layer):
         self.gradient.put(grain_weight, grain_bias)
 
         backward_chain_error = self.wieght.T.dot(error)
-        #backward_chain_error[self.input <= 0] = 0
+        backward_chain_error[self.input <= 0] = 0
 
         return backward_chain_error
 
