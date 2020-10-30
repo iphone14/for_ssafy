@@ -51,14 +51,14 @@ def conv(image, label, params):
     db5 = np.sum(dout, axis = 1).reshape(b5.shape) # loss gradient of final dense layer biases
 
     dl = w5.T.dot(dout) # loss gradient of first dense layer outputs
-    dl[l<=0] = 0 # backpropagate through ReLU
 
+    dl[l<=0] = 0 # backpropagate through ReLU
     dw4 = dl.dot(z.T) # loss gradient of final dense layer weights
     db4 = np.sum(dl, axis = 1).reshape(b4.shape) # loss gradient of final dense layer biases
 
     dz = w4.T.dot(dl) # loss gradient of first dense layer outputs
-    dz[z<=0] = 0 # backpropagate through ReLU
 
+    dz[z<=0] = 0 # backpropagate through ReLU
     dw3 = dz.dot(fc.T)
     db3 = np.sum(dz, axis = 1).reshape(b3.shape)
 
@@ -66,11 +66,12 @@ def conv(image, label, params):
     dpool = dfc.reshape(pooled.shape) # reshape fully connected into dimensions of pooling layer
 
     dconv2 = maxpoolBackward(dpool, conv2, pool_size, pool_stride) # backprop through the max-pooling layer(only neurons with highest activation in window get updated)
+
     dconv2[conv2<=0] = 0 # backpropagate through ReLU
-
     dconv1, df2, db2 = convolutionBackward(dconv2, conv1, f2, conv_stride) # backpropagate previous gradient through second convolutional layer.
-    dconv1[conv1<=0] = 0 # backpropagate through ReLU
 
+
+    dconv1[conv1<=0] = 0 # backpropagate through ReLU
     dimage, df1, db1 = convolutionBackward(dconv1, image, f1, conv_stride) # backpropagate previous gradient through first convolutional layer.
 
     grads = [df1, df2, dw3, dw4, dw5, db1, db2, db3, db4, db5]

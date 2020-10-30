@@ -153,7 +153,7 @@ class Convolution(Layer):
 
             grain_bias[filter] = np.sum(error[filter])
 
-
+        self.gradient.put(grain_weight, grain_bias)
 
         return output
 
@@ -173,14 +173,10 @@ class Convolution(Layer):
 
         return (filters,) + calc_shape
 
-
     def updateGradient(self):
-        pass
-
-
-
-
-
+        self.weight += self.gradient.deltaWeight()
+        self.bias += self.gradient.deltaBias()
+        self.gradient.reset()
 
 
 class MaxPooling(Layer):
@@ -274,7 +270,6 @@ class Flatten(Layer):
 
     def updateGradient(self):
         pass
-
 
 
 
