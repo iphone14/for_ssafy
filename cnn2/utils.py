@@ -56,3 +56,10 @@ def extractMNIST(path):
 		Y.append(int(label))
 
 	return np.array(X).reshape(len(X), colorDim, imgSize, imgSize), np.array(Y)
+
+
+def labelToOnehot(label, classes):
+    return np.eye(classes)[label].reshape(classes, 1)
+
+def categoricalCrossEntropy(predict, label):
+    return -np.sum(label * np.log2(predict))

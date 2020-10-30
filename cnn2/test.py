@@ -6,11 +6,48 @@ from utils import *
 from gradient import *
 from layer import *
 
-gradient = Adam(lr=0.001, batches=100, beta1=0.95, beta2=0.95)
+
+gradient = Adam(lr=0.001, beta1=0.95, beta2=0.95)
 
 x, y = extractMNIST('./mnist/train')
 x-= int(np.mean(x))
 x/= int(np.std(x))
+
+
+def forward(head, output):
+
+    chain = head
+
+    while True:
+
+        output = chain.forward(output)
+
+        print(output)
+
+        next = chain.forwardChain()
+
+        if next is None:
+            break
+
+        chain = next
+
+    return output
+
+
+def backward(tail, error):
+
+    chain = tail
+
+    while True:
+        error = chain.backward(error)
+
+        next = chain.backwardChain()
+
+        if next is None:
+            break
+
+        chain = next
+
 
 
 I1 = Input(input_shape=x.shape[1:])
@@ -35,25 +72,39 @@ F1_shape = F1.outputShape()
 print(F1_shape)
 
 
-
-D1 = Dense(units=128, chain=F1, gradient=gradient.copy())
+D1 = Dense(units=128, activation='linear', chain=F1, gradient=gradient.copy())
 D1_shape = D1.outputShape()
 print(D1_shape)
 
 
-
-D2 = Dense(units=64, chain=D1, gradient=gradient.copy())
+D2 = Dense(units=64, activation='linear', chain=D1, gradient=gradient.copy())
 D2_shape = D2.outputShape()
 print(D2_shape)
 
 
-
-D3 = Dense(units=10, chain=D2, gradient=gradient.copy())
+D3 = Dense(units=10, activation='softmax', chain=D2, gradient=gradient.copy())
 D3_shape = D3.outputShape()
 print(D3_shape)
 
+classes = 10
 
-chain = I1
+
+output = forward(I1, x[0])
+
+onehot = labelToOnehot(y[0], classes)
+
+loss = categoricalCrossEntropy(output, onehot)
+
+print('loss : ', loss)
+
+error = output - onehot
+
+backward(D3, error)
+
+
+"""
+
+
 print(y[0])
 output = x[0]
 output = chain.forward(output)
@@ -77,8 +128,6 @@ print(output)
 output = chain.forward(output)
 print('---', output.shape, '------')
 print(output)
-
-"""
 
 
 

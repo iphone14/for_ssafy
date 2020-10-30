@@ -23,7 +23,7 @@ class Layer(metaclass=ABCMeta):
         return self.forward_chain
 
     def backwardChain(self):
-        return self.backward-chain
+        return self.backward_chain
 
     @abstractmethod
     def forward(self, input):
@@ -36,6 +36,11 @@ class Layer(metaclass=ABCMeta):
     @abstractmethod
     def outputShape(self):
         pass
+
+    @abstractmethod
+    def updateGradient(self):
+        pass
+
 
 
 class Input(Layer):
@@ -53,6 +58,9 @@ class Input(Layer):
 
     def outputShape(self):
         return self.input_shape
+
+    def updateGradient(self):
+        pass
 
 
 
@@ -133,6 +141,10 @@ class Convolution(Layer):
         return (filters,) + calc_shape
 
 
+    def updateGradient(self):
+        pass
+
+
 class MaxPooling(Layer):
 
     def __init__(self, pool_size, strides, chain):
@@ -176,14 +188,17 @@ class MaxPooling(Layer):
         return (self.input_shape[0],) + calc_shape
 
 
+    def updateGradient(self):
+        pass
+
+
 class Flatten(Layer):
 
     def __init__(self, chain):
         super(Flatten, self).__init__(chain)
 
     def forward(self, input):
-        print('flatten')
-        return None
+        return input.reshape((-1, 1))
 
     def backward(self, error):
         print('back flatten')
@@ -192,13 +207,17 @@ class Flatten(Layer):
     def outputShape(self):
         return (reduce(operator.mul, self.input_shape), )
 
+    def updateGradient(self):
+        pass
+
 
 class Dense(Layer):
 
-    def __init__(self, units, chain, gradient):
+    def __init__(self, units, activation, chain, gradient):
         super(Dense, self).__init__(chain)
 
         self.units = units
+        self.activation = activation
 
         self.wieght = self.initWeight((units, self.input_shape[0]))
         self.bias = np.zeros((units, 1))
@@ -213,7 +232,17 @@ class Dense(Layer):
     def forward(self, input):
 
         self.input = input
-        return self.wieght.dot(input) + bias
+
+        output =  self.wieght.dot(input) + self.bias
+
+        if self.activation == 'softmax':
+            output = np.exp(output)
+            return output/np.sum(output)
+        elif self.activation == 'relu':
+            output[output<=0] = 0
+            return output
+        else:   # linear
+            return output
 
     def backward(self, error):
 
@@ -222,15 +251,15 @@ class Dense(Layer):
 
         self.gradient.put(grain_weight, grain_bias)
 
-        if self.gradient.isFull() == True:
-            self.weight += self.gradient.deltaWeight()
-            self.bias += self.gradient.deltaBias()
-            self.gradient.reset()
-
         backward_chain_error = self.wieght.T.dot(error)
-        backward_chain_error[self.self.input <= 0] = 0
+        #backward_chain_error[self.input <= 0] = 0
 
         return backward_chain_error
 
     def outputShape(self):
         return (self.units, )
+
+    def updateGradient(self):
+        self.weight += self.gradient.deltaWeight()
+        self.bias += self.gradient.deltaBias()
+        self.gradient.reset()
