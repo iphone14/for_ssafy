@@ -19,9 +19,9 @@ def getFileList(path):
 			if fileName.endswith(".png"):
 				fileList.append({"label":dirname, "name":fileName})
 
-	#shuffle(fileList)
+	shuffle(fileList)
 
-	fileList = [{'label': '0', 'name': '1.png'}, {'label': '1', 'name': '1.png'}, {'label': '6', 'name': '32.png'}, {'label': '8', 'name': '137.png'}, {'label': '9', 'name': '4.png'}]
+	#fileList = [{'label': '0', 'name': '1.png'}, {'label': '1', 'name': '1.png'}, {'label': '6', 'name': '32.png'}, {'label': '8', 'name': '137.png'}, {'label': '9', 'name': '4.png'}]
 
 	return fileList
 

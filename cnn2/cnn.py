@@ -134,7 +134,7 @@ def batchTrain(head, tail, x, y):
     updateGradient(head)
 
 
-epochs = 10
+epochs = 50
 
 for epoch in range(epochs):
     batchTrain(I1, D3, x, y)
