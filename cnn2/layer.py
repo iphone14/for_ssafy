@@ -102,7 +102,7 @@ class Convolution(Layer):
         self.last_input = input
 
         (filters, colors, kernel_height, kernel_width) = self.weight.shape
-        (input_colors, input_height, input_width) = input.shape
+        (input_colors, input_height, input_width) = self.input_shape
         (stride_y, stride_x) = self.strides
 
         assert colors == input_colors, "filter miss match"
@@ -132,10 +132,10 @@ class Convolution(Layer):
         error[self.last_output<=0] = 0
 
         (filters, colors, kernel_height, kernel_width) = self.weight.shape
-        (input_colors, input_height, input_width) = self.last_input.shape
+        (input_colors, input_height, input_width) = self.input_shape
         (stride_y, stride_x) = self.strides
 
-        output = np.zeros(self.last_input.shape)
+        output = np.zeros(self.input_shape)
         grain_weight = np.zeros(self.weight.shape)
         grain_bias = np.zeros(self.bias.shape)
 
@@ -191,11 +191,11 @@ class MaxPooling(Layer):
 
         self.pool_size = pool_size
         self.strides = pool_size if strides == None else strides
-        self.input = None
+        self.last_input = None
 
     def forward(self, input):
 
-        self.input = input
+        self.last_input = input
 
         (input_colors, input_height, input_width) = input.shape
         (pool_height, pool_width) = self.pool_size
@@ -225,18 +225,18 @@ class MaxPooling(Layer):
 
     def backward(self, error):
 
-        (input_colors, input_height, input_width) = self.input.shape
+        (input_colors, input_height, input_width) = self.input_shape
         (pool_height, pool_width) = self.pool_size
         (stride_y, stride_x) = self.strides
 
-        output = np.zeros(self.input.shape)
+        output = np.zeros(self.input_shape)
 
         for color in range(input_colors):
             y = out_y = 0
             while (y + pool_height) <= input_height:
                 x = out_x = 0
                 while (x + pool_width) <= input_width:
-                    (a, b) = self.nanargmax(self.input[color, y:y + pool_height, x:x + pool_width])
+                    (a, b) = self.nanargmax(self.last_input[color, y:y + pool_height, x:x + pool_width])
                     output[color, y + a, x + b] = error[color, out_y, out_x]
                     x += stride_x
                     out_x += 1

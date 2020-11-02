@@ -23,8 +23,6 @@ def getFileList(path):
 
 	fileList = [{'label': '0', 'name': '1.png'}, {'label': '1', 'name': '1.png'}, {'label': '6', 'name': '32.png'}, {'label': '8', 'name': '137.png'}, {'label': '9', 'name': '4.png'}]
 
-	#fileList = [{'label': '0', 'name': '1.png'}]
-
 	return fileList
 
 
