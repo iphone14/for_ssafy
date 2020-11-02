@@ -19,7 +19,11 @@ def getFileList(path):
 			if fileName.endswith(".png"):
 				fileList.append({"label":dirname, "name":fileName})
 
-	shuffle(fileList)
+	#shuffle(fileList)
+
+	fileList = [{'label': '0', 'name': '1.png'}, {'label': '1', 'name': '1.png'}, {'label': '6', 'name': '32.png'}, {'label': '8', 'name': '137.png'}, {'label': '9', 'name': '4.png'}]
+
+	#fileList = [{'label': '0', 'name': '1.png'}]
 
 	return fileList
 
@@ -63,3 +67,13 @@ def labelToOnehot(label, classes):
 
 def categoricalCrossEntropy(predict, label):
     return -np.sum(label * np.log2(predict))
+
+def load(name):
+
+	np_path = 'matrix_input' + '/' + name + '.npy'
+	return np.load(np_path)
+
+def save(matrix, name):
+
+	text_path = 'matrix_output' + '/' + name + '.txt'
+	np.savetxt(text_path, matrix.flatten())

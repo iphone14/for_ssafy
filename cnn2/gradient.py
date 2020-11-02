@@ -57,6 +57,9 @@ class Adam(Gradient):
 
         self.size = 0
 
+    def setName(self, name):
+        self.name = name
+
     def copy(self):
         return Adam(self.lr, self.beta1, self.beta2)
 
@@ -68,9 +71,6 @@ class Adam(Gradient):
         self.size += 1
 
     def deltaWeight(self):
-
-        #print(self.size)
-        #print(self.delta_weight)
 
         avg_delta = self.delta_weight / self.size
 
