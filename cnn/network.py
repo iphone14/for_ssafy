@@ -25,20 +25,44 @@ def conv(image, label, params):
     conv1 = convolution(image, f1, b1, conv_stride)
     conv1[conv1<=0] = 0 #ReLU
 
+    save(conv1, 'conv1')
+
     conv2 = convolution(conv1, f2, b2, conv_stride)
     conv2[conv2<=0] = 0 #ReLU
 
+    save(conv2, 'conv2')
+
     pooled = maxpool(conv2, pool_size, pool_stride)
+
+    save(pooled, 'pooled')
 
     fc = pooled.reshape((-1, 1)) # flatten
 
+    print(fc.shape)
+
+    save(fc, 'fc')
+
     z = w3.dot(fc) + b3 # dense
+
+    print('w3', w3.shape)
+
+    save(z, 'z')
 
     l = w4.dot(z) + b4 # dense
 
+    print('w4', w4.shape)
+
+    save(l, 'l')
+
     out = w5.dot(l) + b5 # dense
 
+    print('w5', w5.shape)
+
+
+
     probs = softmax(out)
+
+    save(probs, 'out')
 
     loss = categoricalCrossEntropy(probs, label)
 
@@ -47,32 +71,74 @@ def conv(image, label, params):
     ################################################
     dout = probs - label # derivative of loss w.r.t. final dense layer output
 
+    save(dout, 'dout')
+
     dw5 = dout.dot(l.T) # loss gradient of final dense layer weights
     db5 = np.sum(dout, axis = 1).reshape(b5.shape) # loss gradient of final dense layer biases
 
+    save(dw5, 'dw5')
+    save(db5, 'db5')
+
     dl = w5.T.dot(dout) # loss gradient of first dense layer outputs
 
+    save(dl, 'dl')
+
     dl[l<=0] = 0 # backpropagate through ReLU
+
+
+
     dw4 = dl.dot(z.T) # loss gradient of final dense layer weights
     db4 = np.sum(dl, axis = 1).reshape(b4.shape) # loss gradient of final dense layer biases
 
+    save(dw4, 'dw4')
+    save(db4, 'db4')
+
     dz = w4.T.dot(dl) # loss gradient of first dense layer outputs
 
+    save(dz, 'dz')
+
     dz[z<=0] = 0 # backpropagate through ReLU
+
+
     dw3 = dz.dot(fc.T)
     db3 = np.sum(dz, axis = 1).reshape(b3.shape)
 
+    save(dw3, 'dw3')
+    save(db3, 'db3')
+
+
+
     dfc = w3.T.dot(dz) # loss gradients of fully-connected layer (pooling layer)
+
+
+
+    save(dfc, 'dfc')
+
     dpool = dfc.reshape(pooled.shape) # reshape fully connected into dimensions of pooling layer
 
+    print(dfc.shape)
+
+    save(dpool, 'dpool')
+
     dconv2 = maxpoolBackward(dpool, conv2, pool_size, pool_stride) # backprop through the max-pooling layer(only neurons with highest activation in window get updated)
+    save(dconv2, 'dconv2')
 
     dconv2[conv2<=0] = 0 # backpropagate through ReLU
+
+
     dconv1, df2, db2 = convolutionBackward(dconv2, conv1, f2, conv_stride) # backpropagate previous gradient through second convolutional layer.
 
+    save(dconv2, 'dconv1')
+    save(df2, 'df2')
+    save(db2, 'db2')
 
     dconv1[conv1<=0] = 0 # backpropagate through ReLU
     dimage, df1, db1 = convolutionBackward(dconv1, image, f1, conv_stride) # backpropagate previous gradient through first convolutional layer.
+
+    save(dimage, 'dimage')
+    save(df1, 'df1')
+    save(db1, 'db1')
+
 
     grads = [df1, df2, dw3, dw4, dw5, db1, db2, db3, db4, db5]
 
@@ -126,7 +192,16 @@ def adamGD(X, Y, num_classes, params, cost, paramsAdam):
         dw5+=dw5_
         db5+=db5_
 
+
+
+
+        save3(df1_, 'f' + str(i))
+
         cost_+= loss
+
+
+
+
 
     # Parameter Update
 
@@ -145,28 +220,47 @@ def adamGD(X, Y, num_classes, params, cost, paramsAdam):
     lr = 0.001
     beta1 = 0.95
 
-    print(size)
-    print(dw3)
+    #print(size)
+    #print(dw3)
 
 
     v1 = beta1 * v1 + (1 - beta1) * (df1 / size)**2
     f1 -= lr * (df1 / size)/(np.sqrt(v1) + 1e-7)
 
 
+
     bv1 = beta1 * bv1 + (1 - beta1) * (db1 / size)**2
     b1 -= lr * (db1 / size)/(np.sqrt(bv1) + 1e-7)
+
+    save2(v1, 'adam_v1')
+    save2(f1, 'adam_f1')
+    save2(bv1, 'adam_bv1')
+    save2(b1, 'adam_b1')
 
     v2 = beta1 * v2 + (1 - beta1) * (df2 / size)**2
     f2 -= lr * (df2 / size)/(np.sqrt(v2) + 1e-7)
 
+
     bv2 = beta1 * bv2 + (1 - beta1) * (db2 / size)**2
     b2 -= lr * (db2 / size)/(np.sqrt(bv2) + 1e-7)
+
+    save2(v2, 'adam_v2')
+    save2(f2, 'adam_f2')
+    save2(bv2, 'adam_bv2')
+    save2(b2, 'adam_b2')
 
     v3 = beta1 * v3 + (1 - beta1) * (dw3 / size)**2
     w3 -= lr * (dw3 / size)/(np.sqrt(v3) + 1e-7)
 
     bv3 = beta1 * bv3 + (1 - beta1) * (db3 / size)**2
     b3 -= lr * (db3 / size)/(np.sqrt(bv3) + 1e-7)
+
+
+    save2(v3, 'adam_v3')
+    save2(w3, 'adam_w3')
+    save2(bv3, 'adam_bv3')
+    save2(b3, 'adam_b3')
+
 
     v4 = beta1 * v4 + (1 - beta1) * (dw4 / size)**2
     w4 -= lr * (dw4 / size)/(np.sqrt(v4) + 1e-7)
@@ -175,11 +269,24 @@ def adamGD(X, Y, num_classes, params, cost, paramsAdam):
     b4 -= lr * (db4 / size) / (np.sqrt(bv4) + 1e-7)
 
 
+    save2(v4, 'adam_v4')
+    save2(w4, 'adam_w4')
+    save2(bv4, 'adam_bv4')
+    save2(b4, 'adam_b4')
+
+
     v5 = beta1 * v5 + (1 - beta1) * (dw5 / size)**2
     w5 -= lr * (dw5 / size)/(np.sqrt(v5) + 1e-7)
 
     bv5 = beta1 * bv5 + (1 - beta1) * (db5 / size)**2
     b5 -= lr * (db5 / size) / (np.sqrt(bv5) + 1e-7)
+
+
+
+    save2(v5, 'adam_v5')
+    save2(w5, 'adam_w5')
+    save2(bv5, 'adam_bv5')
+    save2(b5, 'adam_b5')
 
     cost_ = cost_/size
     cost.append(cost_)
@@ -201,7 +308,7 @@ def calPoolOutSize(height, padding):
         a = height / pool_stride
         return a
 
-def train(num_classes = 10, num_filt1 = 5, num_filt2 = 5):
+def train(num_classes = 10, num_filt1 = 3, num_filt2 = 3):
 
     X, Y = extractMNIST('./mnist/training')
 
@@ -222,21 +329,42 @@ def train(num_classes = 10, num_filt1 = 5, num_filt2 = 5):
     densSize2 = 64
     densheight2 = int((num_filt2 * pooloutSize**2) / 2)
 
-    f1, f2, w3, w4, w5 = (num_filt1, X.shape[1], filterSize_1, filterSize_1), (num_filt2, num_filt1, filterSize_2, filterSize_2), (densSize, densheight), (densheight2, densSize), (num_classes, densheight2)
+    f1, f2, w3, w4, w5 = (num_filt1, X.shape[1], filterSize_1, filterSize_1), (num_filt2, num_filt1, filterSize_2, filterSize_2), (densSize, densheight), (densSize2, densSize), (num_classes, densSize2)
 
 
-    f1 = initializeFilter(f1)
-    f2 = initializeFilter(f2)
-    w3 = initializeWeight(w3)
-    w4 = initializeWeight(w4)
-    w5 = initializeWeight(w5)
 
+
+    #f1 = initializeFilter(f1)
+    #f2 = initializeFilter(f2)
+    #w3 = initializeWeight(w3)
+    #w4 = initializeWeight(w4)
+    #w5 = initializeWeight(w5)
+
+    #print('w3.shape', w3.shape)
+    #print('w4.shape', w4.shape)
+    #print('w5.shape', w5.shape)
+
+    #save(f1, 'if1')
+    #save(f2, 'if2')
+    #save(w3, 'iw3')
+    #save(w4, 'iw4')
+    #save(w5, 'iw5')
+
+    f1 = load('if1')
+    f2 = load('if2')
+    w3 = load('iw3')
+    w4 = load('iw4')
+    w5 = load('iw5')
 
     b1 = np.zeros((f1.shape[0], 1))
     b2 = np.zeros((f2.shape[0], 1))
     b3 = np.zeros((w3.shape[0], 1))
+    print('b3 ', b3.shape)
+
     b4 = np.zeros((w4.shape[0], 1))
+    print('b4 ', b4.shape)
     b5 = np.zeros((w5.shape[0], 1))
+    print('b5 ', b5.shape)
 
     params = [f1, f2, w3, w4, w5, b1, b2, b3, b4, b5]
 
@@ -256,7 +384,7 @@ def train(num_classes = 10, num_filt1 = 5, num_filt2 = 5):
 
     cost = []
 
-    epochs = 50
+    epochs = 1
 
     for epoch in range(epochs):
         params, cost, paramsAdam = adamGD(X, Y, num_classes, params, cost, paramsAdam)

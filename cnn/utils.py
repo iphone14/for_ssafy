@@ -10,16 +10,25 @@ def getFileList(path):
 
 	fileList = []
 
+
 	for dirname in os.listdir(path):
 
 		subPath = os.path.join(path, dirname)
+
+		print(subPath)
 
 		for fileName in os.listdir(subPath):
 
 			if fileName.endswith(".png"):
 				fileList.append({"label":dirname, "name":fileName})
 
-	shuffle(fileList)
+
+
+	fileList = [{'label': '0', 'name': '1.png'}, {'label': '1', 'name': '1.png'}, {'label': '6', 'name': '32.png'}, {'label': '8', 'name': '137.png'}, {'label': '9', 'name': '4.png'}]
+
+	#fileList = [{'label': '0', 'name': '1.png'}]
+
+	#shuffle(fileList)
 
 	return fileList
 
@@ -93,3 +102,31 @@ def predict(image, f1, f2, w3, w4, w5, b1, b2, b3, b4, b5, conv_s = 1, pool_f = 
     probs = softmax(out) # predict class probabilities with the softmax activation function
 
     return np.argmax(probs), np.max(probs)
+
+
+
+def load(name):
+
+	np_path = 'matrix' + '/' + name + '.npy'
+	return np.load(np_path)
+
+def save(matrix, name):
+
+	text_path = 'matrix' + '/' + name + '.txt'
+	np.savetxt(text_path, matrix.flatten(), delimiter=' ')
+
+	np_path = 'matrix' + '/' + name
+	np.save(np_path, matrix)
+
+
+
+
+def save2(matrix, name):
+
+	text_path = 'matrix2' + '/' + name + '.txt'
+	np.savetxt(text_path, matrix.flatten(), delimiter=' ')
+
+def save3(matrix, name):
+
+	text_path = 'matrix3' + '/' + name + '.txt'
+	np.savetxt(text_path, matrix.flatten(), delimiter=' ')

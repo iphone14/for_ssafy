@@ -322,9 +322,7 @@ class Dense(Layer):
 
         self.gradient.put(grain_weight, grain_bias)
 
-        backward_chain_error = self.weight.T.dot(error)
-
-        return backward_chain_error
+        return self.weight.T.dot(error)        
 
     def outputShape(self):
         return (self.units, )
