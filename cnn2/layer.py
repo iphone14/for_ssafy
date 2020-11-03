@@ -45,8 +45,8 @@ class Layer(metaclass=ABCMeta):
 
 class Input(Layer):
 
-    def __init__(self, input_shape):
-        super(Input, self).__init__(chain=None)
+    def __init__(self, input_shape, chain=None):
+        super(Input, self).__init__(chain)
         self.input_shape = input_shape
 
     def forward(self, input):
@@ -322,7 +322,7 @@ class Dense(Layer):
 
         self.gradient.put(grain_weight, grain_bias)
 
-        return self.weight.T.dot(error)        
+        return self.weight.T.dot(error)
 
     def outputShape(self):
         return (self.units, )
