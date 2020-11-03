@@ -66,7 +66,6 @@ class Model:
         loss = 0
 
         for i in range(batches):
-
             output = self.forward(head, x[i])
 
             onehot = labelToOnehot(y[i], classes)
@@ -87,7 +86,6 @@ class Model:
         chain = head
 
         while True:
-
             output = chain.forward(output)
 
             next = chain.forwardChain()
@@ -133,3 +131,10 @@ class Model:
                 break
 
             chain = next
+
+
+    def predict(self, x):
+
+        output = self.forward(self.head, x)
+
+        return np.argmax(output)
