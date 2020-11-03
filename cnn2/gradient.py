@@ -31,6 +31,8 @@ class Gradient(metaclass=ABCMeta):
     def reset(self):
         pass
 
+
+
 class Adam(Gradient):
 
     def __init__(self, lr, beta1, beta2):
@@ -88,3 +90,16 @@ class Adam(Gradient):
         self.delta_weight = np.zeros(self.delta_weight.shape)
         self.delta_bias = np.zeros(self.delta_bias.shape)
         self.size = 0
+
+
+
+def createGradient(gradient):
+
+    type = gradient['type']
+    parameter = gradient['parameter']
+
+    if type == 'adam':
+        return Adam(**parameter)
+
+
+    return None

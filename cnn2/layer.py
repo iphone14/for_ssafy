@@ -74,7 +74,8 @@ class Convolution(Layer):
         self.weight = self.initWeight((filters, self.input_shape[0], kernel_size[0], kernel_size[1]))
         self.bias = np.zeros((filters, 1))
 
-        self.gradient = gradient
+        self.gradient = createGradient(gradient)
+        #print(gradient)
         self.gradient.setShape(self.weight.shape, self.bias.shape)
 
         self.last_output = None
@@ -288,7 +289,7 @@ class Dense(Layer):
         self.last_input = None
         self.last_output = None
 
-        self.gradient = gradient
+        self.gradient = createGradient(gradient)
         self.gradient.setShape(self.weight.shape, self.bias.shape)
 
     def initWeight(self, size):

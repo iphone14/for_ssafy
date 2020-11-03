@@ -8,32 +8,32 @@ from layer import *
 
 
 class Model:
-    def __init__(self, layerInfoList):
-        self.layerInfoList = layerInfoList
+    def __init__(self, layerList):
+        self.layerList = layerList
         self.head = None
         self.tail = None
 
-    def createModel(self, layerInfoList):
+    def createModel(self, layerList):
 
         chain = None
         head = None
         tail = None
 
-        for layerInfo in layerInfoList:
-            layerType = layerInfo['type']
-            layerParameter = layerInfo['parameter']
-            layerParameter['chain'] = chain
+        for layer in layerList:
+            type = layer['type']
+            parameter = layer['parameter']
+            parameter['chain'] = chain
 
-            if layerType == 'input':
-                chain = Input(**layerParameter)
-            elif layerType == 'convolution':
-                chain = Convolution(**layerParameter)
-            elif layerType == 'maxPooling':
-                chain = MaxPooling(**layerParameter)
-            elif layerType == 'flatten':
-                chain = Flatten(**layerParameter)
-            elif layerType == 'dense':
-                chain = Dense(**layerParameter)
+            if type == 'input':
+                chain = Input(**parameter)
+            elif type == 'convolution':
+                chain = Convolution(**parameter)
+            elif type == 'maxPooling':
+                chain = MaxPooling(**parameter)
+            elif type == 'flatten':
+                chain = Flatten(**parameter)
+            elif type == 'dense':
+                chain = Dense(**parameter)
 
             if head == None:
                 head = chain
@@ -44,7 +44,7 @@ class Model:
 
     def build(self):
 
-        head, tail = self.createModel(self.layerInfoList)
+        head, tail = self.createModel(self.layerList)
 
         self.head = head
         self.tail = tail
