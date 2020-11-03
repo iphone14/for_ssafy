@@ -42,7 +42,6 @@ class Layer(metaclass=ABCMeta):
         pass
 
 
-
 class Input(Layer):
 
     def __init__(self, input_shape, chain=None):
@@ -62,6 +61,7 @@ class Input(Layer):
         pass
 
 
+
 class Convolution(Layer):
 
     def __init__(self, filters, kernel_size, strides, padding, chain, gradient):
@@ -74,7 +74,6 @@ class Convolution(Layer):
         self.bias = np.zeros((filters, 1))
 
         self.gradient = createGradient(gradient)
-        #print(gradient)
         self.gradient.setShape(self.weight.shape, self.bias.shape)
 
         self.last_output = None
@@ -314,7 +313,7 @@ class Dense(Layer):
 
     def backward(self, error):
 
-        if self.activation == 'linear':
+        if self.activation == 'relu':
             error[self.last_output <= 0] = 0
 
         grain_weight = error.dot(self.last_input.T)

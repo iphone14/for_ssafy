@@ -32,7 +32,6 @@ class Gradient(metaclass=ABCMeta):
         pass
 
 
-
 class Adam(Gradient):
 
     def __init__(self, lr, beta1, beta2):
