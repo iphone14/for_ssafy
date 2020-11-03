@@ -7,10 +7,6 @@ from gradient import *
 from layer import *
 
 
-def className(instance):
-    return instance.__class__.__name__
-
-
 class Model:
     def __init__(self, layerList, log='info'):
         self.layerList = layerList
@@ -44,15 +40,13 @@ class Model:
                 chain = Dense(**parameter)
 
             if self.log == 'info':
-                print('name={0:15} output={1}'.format(className(chain),str(chain.outputShape())))
+                className = chain.__class__.__name__
+                print('name={0:15} output={1}'.format(className, str(chain.outputShape())))
 
             if head == None:
                 head = chain
 
         tail = chain
-
-        if self.log == 'info':
-            print('------------------------------------------------')
 
         return head, tail
 
@@ -67,6 +61,9 @@ class Model:
 
     def train(self, x, y, epochs):
 
+        if self.log == 'info':
+            print('---------------------Train---------------------')
+
         for epoch in range(epochs):
             loss = self.batchTrain(self.head, self.tail, x, y)
 
@@ -78,7 +75,6 @@ class Model:
 
     def categoricalCrossEntropy(self, predict_y, label):
         return -np.sum(label * np.log2(predict_y))
-
 
     def batchTrain(self, head, tail, x, y):
 

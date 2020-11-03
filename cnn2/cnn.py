@@ -37,5 +37,4 @@ for i in range(count):
     else:
         print(test_y[i], '/', pred, ' : X')
 
-
 print('accuracy : ', float(correct / count) * 100, '%')
