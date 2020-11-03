@@ -71,7 +71,7 @@ class Model:
             loss = self.batchTrain(self.head, self.tail, x, y)
 
             if self.log == 'info':
-                print('elapse={0:13} loss={1}'.format((str(epoch) +'/' + str(epochs)), str(loss)))
+                print('epochs={0:13} loss={1}'.format((str(epoch) +'/' + str(epochs)), str(loss)))
 
     def labelToOnehot(self, label, classes):
         return np.eye(classes)[label].reshape(classes, 1)
