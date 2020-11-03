@@ -133,8 +133,12 @@ class Model:
             chain = next
 
 
-    def predict(self, x):
+    def predict(self, test_x):
 
-        output = self.forward(self.head, x)
+        prediction = []
 
-        return np.argmax(output)
+        for x in test_x:
+            output = self.forward(self.head, x)
+            prediction.append(output)
+
+        return prediction        

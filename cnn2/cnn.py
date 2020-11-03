@@ -31,16 +31,18 @@ layerInfoList = [
 
 model = Model(layerInfoList)
 model.build()
-model.train(train_x, train_y, epochs=50)
+model.train(train_x, train_y, epochs=1)
+prediction = model.predict(test_x)
 
-for i in range(len(test_x)):
+count = len(prediction)
+correct = 0
 
-    pred, prob = model.predict(test_x[i])
-
-    print(pred)
-    print(prob)
-
-    if pred == test_y[i]:
+for i in range(count):
+    if np.argmax(prediction[i]) == test_y[i]:
+        correct += 1
         print('ok', test_y[i])
     else:
-        print('no', test_y[i])
+        print('false', test_y[i])
+
+
+print('accuracy : ', float(correct / count) * 100, '%')
