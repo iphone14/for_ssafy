@@ -64,7 +64,7 @@ class Input(Layer):
 
 class Convolution(Layer):
 
-    def __init__(self, filters, kernel_size, strides, padding, chain, gradient):
+    def __init__(self, filters, kernel_size, strides, padding, activation, chain, gradient):
         super(Convolution, self).__init__(chain)
 
         self.strides = strides
@@ -78,6 +78,7 @@ class Convolution(Layer):
 
         self.last_output = None
         self.last_input = None
+        self.activation = activation
 
     def initWeight(self, size, scale = 1.0):
 
@@ -120,7 +121,8 @@ class Convolution(Layer):
                 y += stride_y
                 out_y += 1
 
-        output[output<=0] = 0
+        if self.activation == 'relu':
+            output[output<=0] = 0
 
         self.last_output = output
 
@@ -128,7 +130,8 @@ class Convolution(Layer):
 
     def backward(self, error):
 
-        error[self.last_output<=0] = 0
+        if self.activation == 'relu':
+            error[self.last_output <= 0] = 0
 
         (filters, colors, kernel_height, kernel_width) = self.weight.shape
         (input_colors, input_height, input_width) = self.input_shape
@@ -273,6 +276,7 @@ class Flatten(Layer):
         pass
 
 
+
 class Dense(Layer):
 
     def __init__(self, units, activation, chain, gradient):
@@ -304,8 +308,7 @@ class Dense(Layer):
             output = output/np.sum(output)
         elif self.activation == 'relu':
             output[output<=0] = 0
-        #else:   # linear
-            #self.last_output = output
+        #elif self.activation == 'linear':
 
         self.last_output = output
 
