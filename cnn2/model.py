@@ -24,6 +24,9 @@ class Model:
         head = None
         tail = None
 
+        if self.log == 'info':
+            print('---------------------Model---------------------')
+
         for layer in layerList:
             type = layer['type']
             parameter = layer['parameter']
@@ -41,12 +44,15 @@ class Model:
                 chain = Dense(**parameter)
 
             if self.log == 'info':
-                print('name=' + className(chain) + ', output=' + str(chain.outputShape()))
+                print('name={0:15} output={1}'.format(className(chain),str(chain.outputShape())))
 
             if head == None:
                 head = chain
 
         tail = chain
+
+        if self.log == 'info':
+            print('------------------------------------------------')
 
         return head, tail
 
@@ -65,7 +71,7 @@ class Model:
             loss = self.batchTrain(self.head, self.tail, x, y)
 
             if self.log == 'info':
-                print('elapse=' + str(epoch) + '/' + str(epochs) + ', loss=' + str(loss))
+                print('elapse={0:13} loss={1}'.format((str(epoch) +'/' + str(epochs)), str(loss)))
 
     def labelToOnehot(self, label, classes):
         return np.eye(classes)[label].reshape(classes, 1)

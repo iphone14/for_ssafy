@@ -23,7 +23,7 @@ layerList = [
 
 model = Model(layerList, log='info')
 model.build()
-model.train(train_x, train_y, epochs=10)
+model.train(train_x, train_y, epochs=100)
 prediction = model.predict(test_x)
 
 count = len(prediction)
