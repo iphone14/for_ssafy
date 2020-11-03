@@ -62,7 +62,6 @@ class Input(Layer):
         pass
 
 
-
 class Convolution(Layer):
 
     def __init__(self, filters, kernel_size, strides, padding, chain, gradient):

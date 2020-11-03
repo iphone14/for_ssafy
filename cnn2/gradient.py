@@ -101,5 +101,4 @@ def createGradient(gradient):
     if type == 'adam':
         return Adam(**parameter)
 
-
     return None

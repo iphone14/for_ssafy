@@ -1,26 +1,15 @@
-from abc import *
-import numpy as np
-import operator
-from functools import reduce
 from utils import *
-from gradient import *
-from layer import *
 from model import *
 
 
-#gradient = Adam(lr=0.001, beta1=0.95, beta2=0.95)
-
 gradient = {'type':'adam', 'parameter':{'lr':0.001, 'beta1':0.95, 'beta2':0.95}}
 
-
-
 train_x, train_y = extractMNIST('./mnist/train')
-train_x -= int(np.mean(train_x))
-train_x /= int(np.std(train_x))
+train_x = normalize(train_x)
 
 test_x, test_y = extractMNIST('./mnist/test')
-test_x -= int(np.mean(test_x))
-test_x /= int(np.std(test_x))
+test_x = normalize(test_x)
+
 
 layerList = [
     {'type':'input', 'parameter':{'input_shape':train_x.shape[1:]}},
@@ -35,16 +24,14 @@ layerList = [
 
 model = Model(layerList)
 model.build()
-model.train(train_x, train_y, epochs=50)
+model.train(train_x, train_y, epochs=1)
 prediction = model.predict(test_x)
 
 count = len(prediction)
 correct = 0
 
 for i in range(count):
-
     pred = np.argmax(prediction[i])
-
     if pred == test_y[i]:
         correct += 1
         print(test_y[i], '/', pred,' : O')

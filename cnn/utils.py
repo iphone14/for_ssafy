@@ -117,16 +117,3 @@ def save(matrix, name):
 
 	np_path = 'matrix' + '/' + name
 	np.save(np_path, matrix)
-
-
-
-
-def save2(matrix, name):
-
-	text_path = 'matrix2' + '/' + name + '.txt'
-	np.savetxt(text_path, matrix.flatten(), delimiter=' ')
-
-def save3(matrix, name):
-
-	text_path = 'matrix3' + '/' + name + '.txt'
-	np.savetxt(text_path, matrix.flatten(), delimiter=' ')

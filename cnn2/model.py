@@ -57,6 +57,14 @@ class Model:
             self.batchTrain(self.head, self.tail, x, y)
 
 
+    def labelToOnehot(self, label, classes):
+        return np.eye(classes)[label].reshape(classes, 1)
+
+
+    def categoricalCrossEntropy(self, predict_y, label):
+        return -np.sum(label * np.log2(predict_y))
+
+
     def batchTrain(self, head, tail, x, y):
 
         batches = len(x)
@@ -68,9 +76,9 @@ class Model:
         for i in range(batches):
             output = self.forward(head, x[i])
 
-            onehot = labelToOnehot(y[i], classes)
+            onehot = self.labelToOnehot(y[i], classes)
 
-            loss += categoricalCrossEntropy(output, onehot)
+            loss += self.categoricalCrossEntropy(output, onehot)
 
             error = output - onehot
 

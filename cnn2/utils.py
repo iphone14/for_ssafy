@@ -60,18 +60,18 @@ def extractMNIST(path):
 	return np.array(X).reshape(len(X), colorDim, imgSize, imgSize), np.array(Y)
 
 
-def labelToOnehot(label, classes):
-    return np.eye(classes)[label].reshape(classes, 1)
+def normalize(x):
 
-def categoricalCrossEntropy(predict, label):
-    return -np.sum(label * np.log2(predict))
+	x -= int(np.mean(x))
+	x /= int(np.std(x))
+
+	return x
+
 
 def load(name):
-
 	np_path = 'matrix_input' + '/' + name + '.npy'
 	return np.load(np_path)
 
 def save(matrix, name):
-
 	text_path = 'matrix_output' + '/' + name + '.txt'
 	np.savetxt(text_path, matrix.flatten())
