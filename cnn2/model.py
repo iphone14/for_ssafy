@@ -122,7 +122,6 @@ class Model:
         chain = head
 
         while True:
-
             chain.updateGradient()
 
             next = chain.forwardChain()
@@ -141,4 +140,4 @@ class Model:
             output = self.forward(self.head, x)
             prediction.append(output)
 
-        return prediction        
+        return prediction

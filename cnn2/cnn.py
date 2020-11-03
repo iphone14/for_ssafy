@@ -40,9 +40,9 @@ correct = 0
 for i in range(count):
     if np.argmax(prediction[i]) == test_y[i]:
         correct += 1
-        print('ok', test_y[i])
+        print(test_y[i], ' : O')
     else:
-        print('false', test_y[i])
+        print(test_y[i], ' : X')
 
 
 print('accuracy : ', float(correct / count) * 100, '%')
