@@ -180,21 +180,19 @@ class Model:
 
         prediction = self.predict(x)
 
-        print(prediction)
-
         count = len(prediction)
         correct = 0
 
         for i in range(count):
-            pred = np.argmax(prediction[i])
-            print(pred)
-            if pred == y[i]:
+            p_index = np.argmax(prediction[i])
+            y_index = np.argmax(y[i])
+            if p_index == y_index:
                 correct += 1
                 if self.log == 'info':
-                    print('predict={0:12} correct={1}'.format((y[i] +'/' + pred), 'O'))
+                    print('predict={0:12} correct={1}'.format((str(y_index) +'/' + str(p_index)), 'O'))
             else:
                 if self.log == 'info':
-                    print('predict={0:12} correct={1}'.format((y[i] +'/' + pred), 'X'))
+                    print('predict={0:12} correct={1}'.format((str(y_index) +'/' + str(p_index)), 'X'))
 
         accuracy = float(correct / count) * 100
 

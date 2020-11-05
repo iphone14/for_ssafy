@@ -73,7 +73,7 @@ def main():
 
     modelTemplate = createModelTemplate(train_x.shape[1:], 0)
 
-    epochs = 1
+    epochs = 10
 
     train_y, test_y = oneHotEncode(train_y, test_y)
 
