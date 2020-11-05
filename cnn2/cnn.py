@@ -4,6 +4,24 @@ from model_templates import *
 import datetime
 
 
+def oneHotEncode(train_y, test_y):
+
+    labels = np.hstack((train_y, test_y))
+
+    unique = np.unique(labels, return_counts=False)
+
+    labelIndexs = {key : index for index, key in enumerate(unique)}
+    classes = len(labelIndexs)
+
+    labels = [np.eye(classes)[labelIndexs[y]].reshape(classes, 1) for y in labels]
+    labels = np.array(labels)
+
+    train = labels[0:len(train_y)]
+    test = labels[-len(test_y):]
+
+    return train, test
+
+
 def loadTrain():
     train_x, train_y = extractMNIST('./mnist/train')
     train_x = normalize(train_x)
@@ -55,11 +73,14 @@ def main():
 
     modelTemplate = createModelTemplate(train_x.shape[1:], 0)
 
-    epochs = 100
+    epochs = 1
+
+    train_y, test_y = oneHotEncode(train_y, test_y)
 
     accuracy = test(modelTemplate, epochs, train_x, train_y, test_x, test_y)
 
     print_performance(accuracy, (datetime.datetime.now() - start_time))
+
 
 if __name__ == "__main__":
     main()

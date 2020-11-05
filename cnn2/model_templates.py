@@ -13,7 +13,7 @@ def template_0(input_shape):
         {'type':'flatten', 'parameter':{}},
         {'type':'dense', 'parameter':{'units':128, 'activation':'linear', 'gradient':gradient}},
         {'type':'dense', 'parameter':{'units':64, 'activation':'linear', 'gradient':gradient}},
-        {'type':'dense', 'parameter':{'units':10, 'activation':'linear', 'gradient':gradient}}]
+        {'type':'dense', 'parameter':{'units':5, 'activation':'linear', 'gradient':gradient}}]
 
     return layers
 
@@ -30,7 +30,7 @@ def template_1(input_shape):
         {'type':'flatten', 'parameter':{}},
         {'type':'dense', 'parameter':{'units':128, 'activation':'linear', 'gradient':gradient}},
         {'type':'dense', 'parameter':{'units':64, 'activation':'linear', 'gradient':gradient}},
-        {'type':'dense', 'parameter':{'units':10, 'activation':'linear', 'gradient':gradient}}]
+        {'type':'dense', 'parameter':{'units':5, 'activation':'linear', 'gradient':gradient}}]
 
     return layers
 
