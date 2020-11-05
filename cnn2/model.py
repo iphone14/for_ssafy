@@ -70,11 +70,18 @@ class Model:
             if self.log == 'info':
                 print('epochs={0:13} loss={1}'.format((str(epoch) +'/' + str(epochs)), str(loss)))
 
-    def labelToOnehot(self, label, classes):
+    def encodeOnehot(self, label, classes):
         return np.eye(classes)[label].reshape(classes, 1)
 
-    def categoricalCrossEntropy(self, predict_y, label):
-        return -np.sum(label * np.log2(predict_y))
+    def categoricalCrossEntropy(self, predict, label):
+        return -np.sum(label * np.log2(predict))
+
+    def forwardSoftmax(self, input):
+        input = np.exp(input)
+        return input / np.sum(input)
+
+    def backwardSoftmax(self, predict, label):
+        return predict - label
 
     def batchTrain(self, head, tail, x, y):
 
@@ -85,13 +92,15 @@ class Model:
         loss = 0
 
         for i in range(batches):
-            output = self.forward(head, x[i])
+            predict = self.forward(head, x[i])
 
-            onehot = self.labelToOnehot(y[i], classes)
+            predict = self.forwardSoftmax(predict)
 
-            loss += self.categoricalCrossEntropy(output, onehot)
+            label = self.encodeOnehot(y[i], classes)
 
-            error = output - onehot
+            error = self.backwardSoftmax(predict, label)
+
+            loss += self.categoricalCrossEntropy(predict, label)
 
             self.backward(tail, error)
 
@@ -160,3 +169,28 @@ class Model:
             prediction.append(output)
 
         return prediction
+
+
+    def test(self, test_x, test_y):
+
+        if self.log == 'info':
+            print('---------------------Test---------------------')
+
+        prediction = self.predict(test_x)
+
+        count = len(prediction)
+        correct = 0
+
+        for i in range(count):
+            pred = np.argmax(prediction[i])
+            if pred == test_y[i]:
+                correct += 1
+                if self.log == 'info':
+                    print('predict={0:12} correct={1}'.format((str(test_y[i]) +'/' + str(pred)), 'O'))
+            else:
+                if self.log == 'info':
+                    print('predict={0:12} correct={1}'.format((str(test_y[i]) +'/' + str(pred)), 'X'))
+
+        accuracy = float(correct / count) * 100
+
+        return accuracy

@@ -303,10 +303,7 @@ class Dense(Layer):
 
         output = self.weight.dot(input) + self.bias
 
-        if self.activation == 'softmax':
-            output = np.exp(output)
-            output = output/np.sum(output)
-        elif self.activation == 'relu':
+        if self.activation == 'relu':
             output[output<=0] = 0
         #elif self.activation == 'linear':
 
