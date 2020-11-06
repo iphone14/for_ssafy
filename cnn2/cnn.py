@@ -12,6 +12,9 @@ def oneHotEncode(train_y, test_y):
     unique = np.unique(labels, return_counts=False)
 
     labelIndexs = {key : index for index, key in enumerate(unique)}
+
+    print(labelIndexs)
+
     classes = len(labelIndexs)
 
     labels = [np.eye(classes)[labelIndexs[y]].reshape(classes, 1) for y in labels]
@@ -23,15 +26,15 @@ def oneHotEncode(train_y, test_y):
     return train, test
 
 
-def loadTrain():
-    train_x, train_y = extractMNIST('./mnist/train')
+def loadTrain(datasetType):
+    train_x, train_y = extractMNIST('./mnist/' + datasetType + '/train')
     train_x = normalize(train_x)
 
     return train_x, train_y
 
 
-def loadTest():
-    test_x, test_y = extractMNIST('./mnist/test')
+def loadTest(datasetType):
+    test_x, test_y = extractMNIST('./mnist/' + datasetType + '/test')
     test_x = normalize(test_x)
 
     return test_x, test_y
@@ -52,10 +55,13 @@ def print_performance(accuracy, span):
     table = {'Key':key, 'Values':values}
     print_table(table, True)
 
+
 def print_config(model, gradient, epochs, dataset):
 
+    sizeFullText = {'sm': 'small', 'md':'medium', 'lg':'large'}
+
     Config = ['model', 'gradient', 'epochs', 'dataset']
-    values = [model, gradient, epochs, dataset]
+    values = [sizeFullText[model], gradient, epochs, sizeFullText[dataset]]
     table = {'Config':Config, 'Values':values}
     print_table(table, True)
 
@@ -70,12 +76,12 @@ def test(modelTemplate, epochs, train_x, train_y, test_x, test_y):
     return accuracy
 
 
-def main(model, gradient, epochs, dataset):
+def main(modelType, gradientType, epochs, datasetType):
 
     start_time = datetime.datetime.now()
 
-    train_x, train_y = loadTrain()
-    test_x, test_y = loadTest()
+    train_x, train_y = loadTrain(datasetType)
+    test_x, test_y = loadTest(datasetType)
 
     print_shapes(train_x, train_y, test_x, test_y)
 
@@ -88,14 +94,17 @@ def main(model, gradient, epochs, dataset):
     print_performance(accuracy, (datetime.datetime.now() - start_time))
 
 
-if __name__ == "__main__":
-    #main()
+def parse_arg():
     parser = argparse.ArgumentParser(prog='CNN')
-    parser.add_argument('-m', dest='model', type=str, default='sm', choices=['sm', 'md', 'lg'], help='sample model type (default:lg)')
-    parser.add_argument('-g', dest='gradient', type=str, default='amsd', choices=['adam', 'sgd', 'svm'], help='sample gradient type (default: amsd)')
+    parser.add_argument('-m', dest='modelType', type=str, default='sm', choices=['sm', 'md', 'lg'], help='sample model type (default:lg)')
+    parser.add_argument('-g', dest='gradientType', type=str, default='amsd', choices=['adam', 'sgd', 'svm'], help='sample gradient type (default: amsd)')
     parser.add_argument('-e', dest='epochs', type=int, default=50, help='epochs (default: 50)')
-    parser.add_argument('-d', dest='dataset', type=str, default='100', choices=['100', '300', '400'], help='train set size (default: 100)')
+    parser.add_argument('-d', dest='datasetType', type=str, default='sm', choices=['sm', 'md', 'lg'], help='train set size (default: sm)')
 
-    args = parser.parse_args()
-    print_config(args.model, args.gradient, args.epochs, args.dataset)
-    main(args.model, args.gradient, args.epochs, args.dataset)
+    return parser.parse_args()
+
+if __name__ == "__main__":
+
+    args = parse_arg()
+    print_config(args.modelType, args.gradientType, args.epochs, args.datasetType)
+    main(args.modelType, args.gradientType, args.epochs, args.datasetType)
