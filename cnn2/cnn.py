@@ -1,7 +1,7 @@
 from utils import *
 from model import *
 from model_templates import *
-import datetime
+import datetime as dt
 import argparse
 
 
@@ -96,7 +96,7 @@ def test(modelTemplate, epochs, train_x, train_y, test_x, test_y):
 
 def main(modelType, gradientType, epochs, datasetType):
 
-    start_time = datetime.datetime.now()
+    start_time = dt.datetime.now()
 
     train_x, train_y = loadTrain(datasetType)
     test_x, test_y = loadTest(datasetType)
@@ -113,7 +113,7 @@ def main(modelType, gradientType, epochs, datasetType):
 
     accuracy = test(modelTemplate, epochs, train_x, train_y, test_x, test_y)
 
-    print_performance(accuracy, (datetime.datetime.now() - start_time))
+    print_performance(accuracy, (dt.datetime.now() - start_time))
 
 
 def parse_arg():
