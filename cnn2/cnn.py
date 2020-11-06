@@ -68,9 +68,11 @@ def print_shapes(train_x, train_y, test_x, test_y):
 
 def print_performance(accuracy, span):
 
-    key = ['accuracy', 'seconds']
-    values = [accuracy, span.total_seconds()]
-    table = {'Key':key, 'Values':values}
+    performance = ['accuracy', 'minute span']
+
+    min_span = '{:.2f}'.format(span.total_seconds() / 60)
+    values = [accuracy, min_span]
+    table = {'Performance':performance, 'Values':values}
     print_table(table, True)
 
 
@@ -78,8 +80,8 @@ def print_config(model, gradient, epochs, dataset):
 
     sizeFullText = {'sm': 'small', 'md':'medium', 'lg':'large'}
 
-    Config = ['model', 'gradient', 'epochs', 'dataset']
-    values = [sizeFullText[model], gradient, epochs, sizeFullText[dataset]]
+    Config = ['model', 'gradient', 'dataset', 'epochs']
+    values = [sizeFullText[model], gradient, sizeFullText[dataset], epochs]
     table = {'Config':Config, 'Values':values}
     print_table(table, True)
 
