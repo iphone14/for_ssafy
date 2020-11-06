@@ -2,6 +2,7 @@ from utils import *
 from model import *
 from model_templates import *
 import datetime
+import argparse
 
 
 def oneHotEncode(train_y, test_y):
@@ -51,6 +52,13 @@ def print_performance(accuracy, span):
     table = {'Key':key, 'Values':values}
     print_table(table, True)
 
+def print_config(model, gradient, epochs, dataset):
+
+    Config = ['model', 'gradient', 'epochs', 'dataset']
+    values = [model, gradient, epochs, dataset]
+    table = {'Config':Config, 'Values':values}
+    print_table(table, True)
+
 
 def test(modelTemplate, epochs, train_x, train_y, test_x, test_y):
 
@@ -62,7 +70,7 @@ def test(modelTemplate, epochs, train_x, train_y, test_x, test_y):
     return accuracy
 
 
-def main():
+def main(model, gradient, epochs, dataset):
 
     start_time = datetime.datetime.now()
 
@@ -73,8 +81,6 @@ def main():
 
     modelTemplate = createModelTemplate(train_x.shape[1:], 0)
 
-    epochs = 10
-
     train_y, test_y = oneHotEncode(train_y, test_y)
 
     accuracy = test(modelTemplate, epochs, train_x, train_y, test_x, test_y)
@@ -83,4 +89,13 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    #main()
+    parser = argparse.ArgumentParser(prog='CNN')
+    parser.add_argument('-m', dest='model', type=str, default='sm', choices=['sm', 'md', 'lg'], help='sample model type (default:lg)')
+    parser.add_argument('-g', dest='gradient', type=str, default='amsd', choices=['adam', 'sgd', 'svm'], help='sample gradient type (default: amsd)')
+    parser.add_argument('-e', dest='epochs', type=int, default=50, help='epochs (default: 50)')
+    parser.add_argument('-d', dest='dataset', type=str, default='100', choices=['100', '300', '400'], help='train set size (default: 100)')
+
+    args = parser.parse_args()
+    print_config(args.model, args.gradient, args.epochs, args.dataset)
+    main(args.model, args.gradient, args.epochs, args.dataset)
