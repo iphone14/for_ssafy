@@ -71,18 +71,18 @@ def print_performance(accuracy, span):
     performance = ['accuracy', 'minute span']
 
     min_span = '{:.2f}'.format(span.total_seconds() / 60)
-    values = [accuracy, min_span]
+    values = [str(accuracy) + ' %', min_span]
     table = {'Performance':performance, 'Values':values}
     print_table(table, True)
 
 
-def print_config(model, gradient, epochs, dataset):
+def print_arg(model, gradient, epochs, dataset):
 
     sizeFullText = {'sm': 'small', 'md':'medium', 'lg':'large'}
 
-    Config = ['model', 'gradient', 'dataset', 'epochs']
+    arg = ['model', 'gradient', 'dataset', 'epochs']
     values = [sizeFullText[model], gradient, sizeFullText[dataset], epochs]
-    table = {'Config':Config, 'Values':values}
+    table = {'Argument':arg, 'Values':values}
     print_table(table, True)
 
 
@@ -130,5 +130,5 @@ def parse_arg():
 if __name__ == "__main__":
 
     args = parse_arg()
-    print_config(args.modelType, args.gradientType, args.epochs, args.datasetType)
+    print_arg(args.modelType, args.gradientType, args.epochs, args.datasetType)
     main(args.modelType, args.gradientType, args.epochs, args.datasetType)
