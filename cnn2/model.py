@@ -7,6 +7,7 @@ from gradient import *
 from layer import *
 
 
+
 class Model:
     def __init__(self, layerList, log='info'):
         self.layerList = layerList
@@ -24,20 +25,13 @@ class Model:
         showColumn = True
 
         for layer in layerList:
-            type = layer['type']
             parameter = layer['parameter']
             parameter['chain'] = chain
 
-            if type == 'input':
-                chain = Input(**parameter)
-            elif type == 'convolution':
-                chain = Convolution(**parameter)
-            elif type == 'maxPooling':
-                chain = MaxPooling(**parameter)
-            elif type == 'flatten':
-                chain = Flatten(**parameter)
-            elif type == 'dense':
-                chain = Dense(**parameter)
+            layerClass = {'input':Input, 'convolution':Convolution, 'maxPooling':MaxPooling, 'flatten':Flatten, 'dense':Dense}
+            type = layer['type']
+
+            chain = layerClass[type](**parameter)
 
             if self.log == 'info':
                 table = {'Layer':[chain.__class__.__name__], 'Output Shape':[chain.outputShape()]}
@@ -187,7 +181,7 @@ class Model:
         showColumn = True
 
         np.set_printoptions(formatter={'float_kind': lambda x: "{0:0.2f}".format(x)})
-        
+
         for i in range(count):
 
             p_index = np.argmax(prediction[i])
