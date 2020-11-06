@@ -21,8 +21,7 @@ class Model:
         head = None
         tail = None
 
-        if self.log == 'info':
-            print('---------------------Model---------------------')
+        showColumn = True
 
         for layer in layerList:
             type = layer['type']
@@ -41,8 +40,9 @@ class Model:
                 chain = Dense(**parameter)
 
             if self.log == 'info':
-                className = chain.__class__.__name__
-                print('name={0:15} output={1}'.format(className, str(chain.outputShape())))
+                table = {'Layer':[chain.__class__.__name__], 'Output Shape':[chain.outputShape()]}
+                print_table(table, showColumn)
+                showColumn = False
 
             if head == None:
                 head = chain
@@ -63,16 +63,18 @@ class Model:
 
     def train(self, x, y, epochs):
 
-        if self.log == 'info':
-            print('---------------------Train---------------------')
-
         classes = y.shape[1]
+
+        showColumn = True
 
         for epoch in range(epochs):
             loss = self.batchTrain(self.head, self.tail, x, y, classes)
 
             if self.log == 'info':
-                print('epochs={0:13} loss={1}'.format((str(epoch) +'/' + str(epochs)), str(loss)))
+                table = {'Epochs':[str(epoch) +'/' + str(epochs)], 'Loss':[loss]}
+                print_table(table, showColumn)
+                showColumn = False
+
 
     def encodeOnehot(self, label, classes):
         return np.eye(classes)[label].reshape(classes, 1)
@@ -167,33 +169,40 @@ class Model:
         prediction = []
 
         for x in test_x:
-            output = self.forward(self.head, x)
-            prediction.append(output)
+            predict = self.forward(self.head, x)
+
+            predict = self.forwardSoftmax(predict)
+            prediction.append(predict)
 
         return prediction
 
 
     def test(self, x, y):
 
-        if self.log == 'info':
-            print('---------------------Test---------------------')
-
         prediction = self.predict(x)
 
         count = len(prediction)
-        correct = 0
+        correct_count = 0
 
+        showColumn = True
+
+        np.set_printoptions(formatter={'float_kind': lambda x: "{0:0.2f}".format(x)})
+        
         for i in range(count):
+
             p_index = np.argmax(prediction[i])
             y_index = np.argmax(y[i])
-            if p_index == y_index:
-                correct += 1
-                if self.log == 'info':
-                    print('predict={0:12} correct={1}'.format((str(y_index) +'/' + str(p_index)), 'O'))
-            else:
-                if self.log == 'info':
-                    print('predict={0:12} correct={1}'.format((str(y_index) +'/' + str(p_index)), 'X'))
 
-        accuracy = float(correct / count) * 100
+            correct_count += (1 if p_index == y_index else 0)
+
+            if self.log == 'info':
+                correct = 'O' if p_index == y_index else 'X'
+                y_label = y[i].reshape(-1).round(decimals=2)
+                y_predict = prediction[i].reshape(-1).round(decimals=2)
+                table = {'Predict':[y_predict], 'Label':[y_label], 'Correct':[correct]}
+                print_table(table, showColumn)
+                showColumn = False
+
+        accuracy = float(correct_count / count) * 100
 
         return accuracy

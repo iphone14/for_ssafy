@@ -15,6 +15,8 @@ def template_0(input_shape):
         {'type':'dense', 'parameter':{'units':64, 'activation':'linear', 'gradient':gradient}},
         {'type':'dense', 'parameter':{'units':5, 'activation':'linear', 'gradient':gradient}}]
 
+    print(layers)
+
     return layers
 
 

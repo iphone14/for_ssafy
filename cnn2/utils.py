@@ -75,3 +75,33 @@ def load(name):
 def save(matrix, name):
 	text_path = 'matrix_output' + '/' + name + '.txt'
 	np.savetxt(text_path, matrix.flatten())
+
+
+def print_table(table, showColumn):
+
+	template = ''
+
+	for key in table:
+		template += '{' + key + ':30}'
+
+	if showColumn == True:
+		print('')
+		print('='*70)
+		colmun = {}
+
+		for key in table:
+			colmun[key] = key
+
+		print(template.format(**colmun))
+
+		print('-'*70)
+
+	firstKey = list(table.keys())[0]
+	length = len(table[firstKey])
+
+	for i in range(length):
+		dict = {}
+		for key in table:
+			dict[key] = str(table[key][i])
+
+		print(template.format(**dict))

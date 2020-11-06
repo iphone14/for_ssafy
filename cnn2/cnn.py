@@ -38,18 +38,18 @@ def loadTest():
 
 def print_shapes(train_x, train_y, test_x, test_y):
 
-    print('---------------------Shape---------------------')
-    print('train_x{0:14}shape={1}'.format('', train_x.shape))
-    print('train_y{0:14}shape={1}'.format('', train_y.shape))
-    print('test_x{0:15}shape={1}'.format('', test_x.shape))
-    print('test_y{0:15}shape={1}'.format('', test_y.shape))
+    data = ['train_x', 'train_y', 'test_x', 'test_y']
+    shape = [train_x.shape, train_y.shape, test_x.shape, test_y.shape]
+    table = {'Data':data, 'Shape':shape}
+    print_table(table, True)
 
 
 def print_performance(accuracy, span):
 
-    print('---------------------Performance---------------------')
-    print('accuracy{0:13}{1}%'.format('', accuracy))
-    print('seconds{0:14}{1}'.format('', span.total_seconds()))
+    key = ['accuracy', 'seconds']
+    values = [accuracy, span.total_seconds()]
+    table = {'Key':key, 'Values':values}
+    print_table(table, True)
 
 
 def test(modelTemplate, epochs, train_x, train_y, test_x, test_y):
