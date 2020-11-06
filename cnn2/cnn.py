@@ -5,19 +5,22 @@ import datetime
 import argparse
 
 
-def oneHotEncode(train_y, test_y):
+def makeOneHotMap(train_y, test_y):
 
     labels = np.hstack((train_y, test_y))
 
     unique = np.unique(labels, return_counts=False)
 
-    labelIndexs = {key : index for index, key in enumerate(unique)}
+    return {key : index for index, key in enumerate(unique)}
 
-    print(labelIndexs)
 
-    classes = len(labelIndexs)
+def oneHotEncode(oneHotMap, train_y, test_y):
 
-    labels = [np.eye(classes)[labelIndexs[y]].reshape(classes, 1) for y in labels]
+    labels = np.hstack((train_y, test_y))
+
+    classes = len(oneHotMap)
+
+    labels = [np.eye(classes)[oneHotMap[y]].reshape(classes, 1) for y in labels]
     labels = np.array(labels)
 
     train = labels[0:len(train_y)]
@@ -38,6 +41,21 @@ def loadTest(datasetType):
     test_x = normalize(test_x)
 
     return test_x, test_y
+
+
+def print_oneHotMap(oneHotMap):
+
+    oneHotList = []
+    labelList = []
+
+    classes = len(oneHotMap)
+
+    for mapKey in oneHotMap:
+        map = np.eye(classes)[oneHotMap[mapKey]].reshape(classes, 1)
+        oneHotList.append(map.reshape(-1))
+        labelList.append(mapKey)
+
+    print_table({'Label':labelList, 'OneHot':oneHotList}, True)
 
 
 def print_shapes(train_x, train_y, test_x, test_y):
@@ -85,9 +103,13 @@ def main(modelType, gradientType, epochs, datasetType):
 
     print_shapes(train_x, train_y, test_x, test_y)
 
-    modelTemplate = createModelTemplate(train_x.shape[1:], 0)
+    modelTemplate = createModelTemplate(modelType, gradientType, train_x.shape[1:])
 
-    train_y, test_y = oneHotEncode(train_y, test_y)
+    oneHotMap = makeOneHotMap(train_y, test_y)
+
+    print_oneHotMap(oneHotMap)
+
+    train_y, test_y = oneHotEncode(oneHotMap, train_y, test_y)
 
     accuracy = test(modelTemplate, epochs, train_x, train_y, test_x, test_y)
 
@@ -97,7 +119,7 @@ def main(modelType, gradientType, epochs, datasetType):
 def parse_arg():
     parser = argparse.ArgumentParser(prog='CNN')
     parser.add_argument('-m', dest='modelType', type=str, default='sm', choices=['sm', 'md', 'lg'], help='sample model type (default:lg)')
-    parser.add_argument('-g', dest='gradientType', type=str, default='amsd', choices=['adam', 'sgd', 'svm'], help='sample gradient type (default: amsd)')
+    parser.add_argument('-g', dest='gradientType', type=str, default='adam', choices=['adam', 'sgd', 'RMSprop'], help='sample gradient type (default: adam)')
     parser.add_argument('-e', dest='epochs', type=int, default=50, help='epochs (default: 50)')
     parser.add_argument('-d', dest='datasetType', type=str, default='sm', choices=['sm', 'md', 'lg'], help='train set size (default: sm)')
 
