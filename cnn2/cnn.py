@@ -81,7 +81,7 @@ def print_arg(model, gradient, epochs, dataset):
     sizeFullText = {'sm': 'small', 'md':'medium', 'lg':'large'}
 
     arg = ['model', 'gradient', 'dataset', 'epochs']
-    values = [sizeFullText[model], gradient, sizeFullText[dataset], epochs]
+    values = [model, gradient, sizeFullText[dataset], epochs]
     table = {'Argument':arg, 'Values':values}
     print_table(table, True)
 
@@ -105,11 +105,11 @@ def main(modelType, gradientType, epochs, datasetType):
 
     print_shapes(train_x, train_y, test_x, test_y)
 
-    modelTemplate = createModelTemplate(modelType, gradientType, train_x.shape[1:])
-
     oneHotMap = makeOneHotMap(train_y, test_y)
 
     print_oneHotMap(oneHotMap)
+
+    modelTemplate = createModelTemplate(modelType, gradientType, train_x.shape[1:], len(oneHotMap))
 
     train_y, test_y = oneHotEncode(oneHotMap, train_y, test_y)
 
@@ -120,8 +120,8 @@ def main(modelType, gradientType, epochs, datasetType):
 
 def parse_arg():
     parser = argparse.ArgumentParser(prog='CNN')
-    parser.add_argument('-m', dest='modelType', type=str, default='sm', choices=['sm', 'md', 'lg'], help='sample model type (default:lg)')
-    parser.add_argument('-g', dest='gradientType', type=str, default='RMSprop', choices=['Adam', 'SGD', 'RMSprop'], help='sample gradient type (default: RMSprop)')
+    parser.add_argument('-m', dest='modelType', type=str, default='simple', choices=['simple', 'basic', 'rich'], help='sample model type (default:simple)')
+    parser.add_argument('-g', dest='gradientType', type=str, default='Adam', choices=['Adam', 'SGD', 'RMSprop'], help='sample gradient type (default: RMSprop)')
     parser.add_argument('-e', dest='epochs', type=int, default=50, help='epochs (default: 50)')
     parser.add_argument('-d', dest='datasetType', type=str, default='sm', choices=['sm', 'md', 'lg'], help='train set size (default: sm)')
 

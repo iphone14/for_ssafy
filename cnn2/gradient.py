@@ -197,12 +197,6 @@ def createGradient(gradient):
 
     type = gradient['type']
     parameter = gradient['parameter']
+    typeClass = {'RMSprop':RMSprop, 'Adam':Adam, 'SGD':SGD}
 
-    if type == 'RMSprop':
-        return RMSprop(**parameter)
-    elif type == 'Adam':
-        return Adam(**parameter)
-    elif type == 'SGD':
-        return SGD(**parameter)
-
-    return None
+    return typeClass[type](**parameter)
