@@ -6,8 +6,6 @@ from utils import *
 from gradient import *
 from layer import *
 
-
-
 class Model:
     def __init__(self, layerList, log='info'):
         self.layerList = layerList

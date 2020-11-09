@@ -121,7 +121,7 @@ def main(modelType, gradientType, epochs, datasetType):
 def parse_arg():
     parser = argparse.ArgumentParser(prog='CNN')
     parser.add_argument('-m', dest='modelType', type=str, default='sm', choices=['sm', 'md', 'lg'], help='sample model type (default:lg)')
-    parser.add_argument('-g', dest='gradientType', type=str, default='adam', choices=['adam', 'sgd', 'RMSprop'], help='sample gradient type (default: adam)')
+    parser.add_argument('-g', dest='gradientType', type=str, default='RMSprop', choices=['Adam', 'SGD', 'RMSprop'], help='sample gradient type (default: RMSprop)')
     parser.add_argument('-e', dest='epochs', type=int, default=50, help='epochs (default: 50)')
     parser.add_argument('-d', dest='datasetType', type=str, default='sm', choices=['sm', 'md', 'lg'], help='train set size (default: sm)')
 

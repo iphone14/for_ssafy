@@ -1,12 +1,11 @@
+def gradient_sgd():
+    return {'type':'SGD', 'parameter':{'lr':0.01}}
 
 def gradient_adam():
-    return {'type':'adam', 'parameter':{'lr':0.001, 'beta1':0.95, 'beta2':0.95}}
-
-def gradient_sgd():
-    return {'type':'sgd', 'parameter':{'lr':0.001, 'beta1':0.95, 'beta2':0.95}}
+    return {'type':'Adam', 'parameter':{'lr':0.001, 'beta1':0.95, 'beta2':0.95, 'exp':1e-7}}
 
 def gradient_RMSprop():
-    return {'type':'RMSprop', 'parameter':{'lr':0.001, 'beta1':0.95, 'beta2':0.95}}
+    return {'type':'RMSprop', 'parameter':{'lr':0.001, 'beta':0.95, 'exp':1e-8}}
 
 
 def template_lg(gradient, input_shape):
@@ -59,7 +58,7 @@ def template_sm(gradient, input_shape):
 def createModelTemplate(modelType, gradientType, input_shape):
 
     modelTypeList = {'sm': template_sm, 'md': template_md, 'lg':template_lg}
-    gradientTypeList = {'adam':gradient_adam, 'sgd':gradient_sgd, 'RMSProp':gradient_RMSprop}
+    gradientTypeList = {'Adam':gradient_adam, 'SGD':gradient_sgd, 'RMSprop':gradient_RMSprop}
 
     template = modelTypeList[modelType]
     gradient = gradientTypeList[gradientType]
