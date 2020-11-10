@@ -6,6 +6,7 @@ from layer.convolution import *
 from layer.max_pooling import *
 from layer.flatten import *
 from layer.dense import *
+import random
 
 class Model:
     def __init__(self, layerList, log='info'):
@@ -54,14 +55,22 @@ class Model:
         return head, tail
 
 
-    def train(self, x, y, epochs):
+    def train(self, x, y, epochs, batche_ratio):
 
         classes = y.shape[1]
 
         showColumn = True
 
+        batches = int(len(x) * batche_ratio)
+
         for epoch in range(epochs):
-            loss = self.batchTrain(self.head, self.tail, x, y, classes)
+
+            indexs = random.sample(list(range(0, len(x))), batches)
+
+            batch_x = x[indexs]
+            batch_y = y[indexs]
+
+            loss = self.batchTrain(self.head, self.tail, batch_x, batch_y, classes)
 
             if self.log == 'info':
                 table = {'Epochs':[str(epoch) +'/' + str(epochs)], 'Loss':[loss]}
