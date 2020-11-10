@@ -121,18 +121,26 @@ def main(datasetType, modelType, gradientType, epochs, batche_ratio):
 
 
 def parse_arg():
+
+
     parser = argparse.ArgumentParser(prog='CNN')
     parser.add_argument('-d', dest='datasetType', type=str, default='sm', choices=['sm', 'md', 'lg'], help='train set size (default: sm)')
     parser.add_argument('-m', dest='modelType', type=str, default='simple', choices=['simple', 'basic', 'rich'], help='sample model type (default:simple)')
     parser.add_argument('-g', dest='gradientType', type=str, default='Adam', choices=['Adam', 'SGD', 'RMSprop'], help='sample gradient type (default: RMSprop)')
     parser.add_argument('-e', dest='epochs', type=int, default=50, help='epochs (default: 50)')
-    parser.add_argument('-b', dest='batche_ratio', type=float, default=0.2, help='batche ratio (default: 0.2)')
+    parser.add_argument('-b', dest='batche_ratio', type=float, default=0.2, metavar="[0.001-1.000]", help='batche ratio (default: 0.2)')
 
+    args = parser.parse_args()
 
-    return parser.parse_args()
+    if args.batche_ratio < 0.001 or args.batche_ratio > 1.00:
+        print('CNN: error: argument -b: invalid choice: ', str(args.batche_ratio), ' (choose from range [0.001-1.000]')
+        return None
+
+    return args
 
 if __name__ == "__main__":
 
     args = parse_arg()
 
-    main(args.datasetType, args.modelType, args.gradientType, args.epochs, args.batche_ratio)
+    if args != None:
+        main(args.datasetType, args.modelType, args.gradientType, args.epochs, args.batche_ratio)
