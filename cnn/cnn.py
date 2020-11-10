@@ -75,14 +75,16 @@ def print_performance(accuracy, span):
     print_table(table, True)
 
 
-def print_arg(dataset, model, gradient, epochs, batche_ratio, data_count):
+def print_arg(dataset, model, gradient, epochs, batche_ratio, total_dataset):
 
     sizeFullText = {'sm': 'small', 'md':'medium', 'lg':'large'}
 
-    batches = int(batche_ratio * data_count)
+    batches_count = int(batche_ratio * total_dataset)
 
-    arg = ['dataset', 'model', 'gradient', 'epochs', 'batche ratio', 'batches']
-    values = [sizeFullText[dataset], model, gradient, epochs, batche_ratio, batches]
+    batches_str = str(batches_count) + ' = ' + str(total_dataset) + ' x ' + str(batche_ratio)
+
+    arg = ['dataset', 'model', 'gradient', 'epochs', 'total dataset', 'batche ratio', 'batches']
+    values = [sizeFullText[dataset], model, gradient, epochs, total_dataset, batche_ratio, batches_str]
     table = {'Argument':arg, 'Values':values}
     print_table(table, True)
 
