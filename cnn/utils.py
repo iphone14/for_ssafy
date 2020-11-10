@@ -1,34 +1,27 @@
-from forward import *
 import numpy as np
 from PIL import Image
 import os
-
 from array import *
 from random import shuffle
+import operator
+
 
 def getFileList(path):
 
 	fileList = []
 
-
 	for dirname in os.listdir(path):
 
 		subPath = os.path.join(path, dirname)
-
-		print(subPath)
 
 		for fileName in os.listdir(subPath):
 
 			if fileName.endswith(".png"):
 				fileList.append({"label":dirname, "name":fileName})
 
+	shuffle(fileList)
 
-
-	fileList = [{'label': '0', 'name': '1.png'}, {'label': '1', 'name': '1.png'}, {'label': '6', 'name': '32.png'}, {'label': '8', 'name': '137.png'}, {'label': '9', 'name': '4.png'}]
-
-	#fileList = [{'label': '0', 'name': '1.png'}]
-
-	#shuffle(fileList)
+	#fileList = [{'label': '0', 'name': '1.png'}, {'label': '1', 'name': '1.png'}, {'label': '6', 'name': '32.png'}, {'label': '8', 'name': '137.png'}, {'label': '9', 'name': '4.png'}]
 
 	return fileList
 
@@ -67,53 +60,39 @@ def extractMNIST(path):
 	return np.array(X).reshape(len(X), colorDim, imgSize, imgSize), np.array(Y)
 
 
-def initializeFilter(size, scale = 1.0):
-    stddev = scale/np.sqrt(np.prod(size))
-    return np.random.normal(loc = 0, scale = stddev, size = size)
+def normalize(x):
 
-def initializeWeight(size):
-    return np.random.standard_normal(size=size) * 0.01
+	x -= int(np.mean(x))
+	x /= int(np.std(x))
 
-def nanargmax(arr):
-    idx = np.nanargmax(arr)
-    idxs = np.unravel_index(idx, arr.shape)
-    return idxs
-
-def predict(image, f1, f2, w3, w4, w5, b1, b2, b3, b4, b5, conv_s = 1, pool_f = 2, pool_s = 2):
-    '''
-    Make predictions with trained filters/weights.
-    '''
-    conv1 = convolution(image, f1, b1, conv_s) # convolution operation
-    conv1[conv1<=0] = 0 #relu activation
-
-    conv2 = convolution(conv1, f2, b2, conv_s) # second convolution operation
-    conv2[conv2<=0] = 0 # pass through ReLU non-linearity
-
-    pooled = maxpool(conv2, pool_s) # maxpooling operation
-    (nf2, dim2, _) = pooled.shape
-    fc = pooled.reshape((nf2 * dim2 * dim2, 1)) # flatten pooled layer
+	return x
 
 
-    l = w3.dot(fc) + b3 # second dense layer
-    z = w4.dot(l) + b4 # second dense layer
-    out = w5.dot(z) + b5 # second dense layer
+def print_table(table, showColumn):
 
+	template = ''
 
-    probs = softmax(out) # predict class probabilities with the softmax activation function
+	for key in table:
+		template += '{' + key + ':30}'
 
-    return np.argmax(probs), np.max(probs)
+	if showColumn == True:
+		print('')
+		print('='*70)
+		colmun = {}
 
+		for key in table:
+			colmun[key] = key
 
+		print(template.format(**colmun))
 
-def load(name):
+		print('-'*70)
 
-	np_path = 'matrix' + '/' + name + '.npy'
-	return np.load(np_path)
+	firstKey = list(table.keys())[0]
+	length = len(table[firstKey])
 
-def save(matrix, name):
+	for i in range(length):
+		dict = {}
+		for key in table:
+			dict[key] = str(table[key][i])
 
-	text_path = 'matrix' + '/' + name + '.txt'
-	np.savetxt(text_path, matrix.flatten(), delimiter=' ')
-
-	np_path = 'matrix' + '/' + name
-	np.save(np_path, matrix)
+		print(template.format(**dict))
