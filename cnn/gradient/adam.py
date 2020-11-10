@@ -12,8 +12,8 @@ class Adam(ABSGradient):
         self.delta_weight = None
         self.delta_bias = None
 
-        self.cumulative_weight = None
-        self.cumulative_bias = None
+        self.vector_weight = None
+        self.vector_bias = None
 
         self.exp = exp
 
@@ -24,8 +24,8 @@ class Adam(ABSGradient):
         self.delta_weight = np.zeros(weightShape)
         self.delta_bias = np.zeros(biasShape)
 
-        self.cumulative_weight = np.zeros(weightShape)
-        self.cumulative_bias = np.zeros(biasShape)
+        self.vector_weight = np.zeros(weightShape)
+        self.vector_bias = np.zeros(biasShape)
 
         self.size = 0
 
@@ -40,17 +40,17 @@ class Adam(ABSGradient):
 
         avg_delta = self.delta_weight / self.size
 
-        self.cumulative_weight = self.beta1 * self.cumulative_weight + (1 - self.beta2) * (avg_delta)**2
+        self.vector_weight = self.beta1 * self.vector_weight + (1 - self.beta2) * (avg_delta)**2
 
-        return self.lr * (avg_delta)/(np.sqrt(self.cumulative_weight) + self.exp)
+        return self.lr * (avg_delta)/(np.sqrt(self.vector_weight) + self.exp)
 
     def deltaBias(self):
 
         avg_delta = self.delta_bias / self.size
 
-        self.cumulative_bias = self.beta1 * self.cumulative_bias + (1 - self.beta2) * (avg_delta)**2
+        self.vector_bias = self.beta1 * self.vector_bias + (1 - self.beta2) * (avg_delta)**2
 
-        return self.lr * (avg_delta)/(np.sqrt(self.cumulative_bias) + self.exp)
+        return self.lr * (avg_delta)/(np.sqrt(self.vector_bias) + self.exp)
 
     def reset(self):
 

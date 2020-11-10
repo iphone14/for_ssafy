@@ -13,9 +13,9 @@ def template_rich(gradient, input_shape, classes):
 
     layers = [
         {'type':'input', 'parameter':{'input_shape':input_shape}},
-        {'type':'convolution', 'parameter':{'filters':3, 'kernel_size':(5, 5), 'strides':(1, 1), 'padding':True, 'activation':'relu', 'gradient':gradient}},
-        {'type':'convolution', 'parameter':{'filters':3, 'kernel_size':(3, 3), 'strides':(1, 1), 'padding':True, 'activation':'linear', 'gradient':gradient}},
         {'type':'convolution', 'parameter':{'filters':3, 'kernel_size':(3, 3), 'strides':(1, 1), 'padding':True, 'activation':'relu', 'gradient':gradient}},
+        {'type':'convolution', 'parameter':{'filters':3, 'kernel_size':(3, 3), 'strides':(1, 1), 'padding':True, 'activation':'relu', 'gradient':gradient}},
+        {'type':'convolution', 'parameter':{'filters':3, 'kernel_size':(3, 3), 'strides':(1, 1), 'padding':True, 'activation':'linear', 'gradient':gradient}},
         {'type':'maxPooling', 'parameter':{'pool_size':(2, 2), 'strides':None}},
         {'type':'flatten', 'parameter':{}},
         {'type':'dense', 'parameter':{'units':256, 'activation':'linear', 'gradient':gradient}},
@@ -23,7 +23,6 @@ def template_rich(gradient, input_shape, classes):
         {'type':'dense', 'parameter':{'units':classes, 'activation':'linear', 'gradient':gradient}}]
 
     return layers
-
 
 
 def template_basic(gradient, input_shape, classes):
