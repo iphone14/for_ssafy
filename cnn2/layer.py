@@ -9,21 +9,21 @@ from gradient import *
 class Layer(metaclass=ABCMeta):
 
     @abstractmethod
-    def __init__(self, chain):
+    def __init__(self, backward_layer):
 
         self.input_shape = None
-        self.backward_chain = chain
-        self.forward_chain = None
+        self.backward_layer = backward_layer
+        self.forward_layer = None
 
-        if chain is not None:
-            self.input_shape = chain.outputShape()
-            chain.forward_chain = self
+        if backward_layer is not None:
+            self.input_shape = backward_layer.outputShape()
+            backward_layer.forward_layer = self
 
-    def forwardChain(self):
-        return self.forward_chain
+    def forwardLayer(self):
+        return self.forward_layer
 
-    def backwardChain(self):
-        return self.backward_chain
+    def backwardLayer(self):
+        return self.backward_layer
 
     @abstractmethod
     def forward(self, input):
@@ -44,8 +44,8 @@ class Layer(metaclass=ABCMeta):
 
 class Input(Layer):
 
-    def __init__(self, input_shape, chain=None):
-        super(Input, self).__init__(chain)
+    def __init__(self, input_shape, backward_layer=None):
+        super(Input, self).__init__(backward_layer)
         self.input_shape = input_shape
 
     def forward(self, input):
@@ -64,8 +64,8 @@ class Input(Layer):
 
 class Convolution(Layer):
 
-    def __init__(self, filters, kernel_size, strides, padding, activation, chain, gradient):
-        super(Convolution, self).__init__(chain)
+    def __init__(self, filters, kernel_size, strides, padding, activation, backward_layer, gradient):
+        super(Convolution, self).__init__(backward_layer)
 
         self.strides = strides
         self.padding_size = self.paddingSize(kernel_size[0], kernel_size[1]) if padding else (0,0)
@@ -188,8 +188,8 @@ class Convolution(Layer):
 
 class MaxPooling(Layer):
 
-    def __init__(self, pool_size, strides, chain):
-        super(MaxPooling, self).__init__(chain)
+    def __init__(self, pool_size, strides, backward_layer):
+        super(MaxPooling, self).__init__(backward_layer)
 
         self.pool_size = pool_size
         self.strides = pool_size if strides == None else strides
@@ -260,8 +260,8 @@ class MaxPooling(Layer):
 
 class Flatten(Layer):
 
-    def __init__(self, chain):
-        super(Flatten, self).__init__(chain)
+    def __init__(self, backward_layer):
+        super(Flatten, self).__init__(backward_layer)
 
     def forward(self, input):
         return input.reshape((-1, 1))
@@ -279,8 +279,8 @@ class Flatten(Layer):
 
 class Dense(Layer):
 
-    def __init__(self, units, activation, chain, gradient):
-        super(Dense, self).__init__(chain)
+    def __init__(self, units, activation, backward_layer, gradient):
+        super(Dense, self).__init__(backward_layer)
 
         self.units = units
         self.activation = activation

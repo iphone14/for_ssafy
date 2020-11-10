@@ -16,7 +16,7 @@ class Model:
 
     def createModel(self, layerList):
 
-        chain = None
+        backward_layer = None
         head = None
         tail = None
 
@@ -24,22 +24,22 @@ class Model:
 
         for layer in layerList:
             parameter = layer['parameter']
-            parameter['chain'] = chain
+            parameter['backward_layer'] = backward_layer
 
             layerClass = {'input':Input, 'convolution':Convolution, 'maxPooling':MaxPooling, 'flatten':Flatten, 'dense':Dense}
             type = layer['type']
 
-            chain = layerClass[type](**parameter)
+            backward_layer = layerClass[type](**parameter)
 
             if self.log == 'info':
-                table = {'Layer':[chain.__class__.__name__], 'Output Shape':[chain.outputShape()]}
+                table = {'Layer':[backward_layer.__class__.__name__], 'Output Shape':[backward_layer.outputShape()]}
                 print_table(table, showColumn)
                 showColumn = False
 
             if head == None:
-                head = chain
+                head = backward_layer
 
-        tail = chain
+        tail = backward_layer
 
         return head, tail
 
@@ -107,53 +107,53 @@ class Model:
 
     def forward(self, head, output):
 
-        chain = head
+        forward_layer = head
 
         while True:
-            output = chain.forward(output)
+            output = forward_layer.forward(output)
 
-            next = chain.forwardChain()
+            next = forward_layer.forwardLayer()
 
             if next is None:
                 break
 
-            chain = next
+            forward_layer = next
 
         return output
 
 
     def backward(self, tail, error):
 
-        chain = tail
+        backward_layer = tail
 
         last_error = None
 
         while True:
-            error = chain.backward(error)
+            error = backward_layer.backward(error)
 
             last_error = error
 
-            next = chain.backwardChain()
+            next = backward_layer.backwardLayer()
 
             if next is None:
                 break
 
-            chain = next
+            backward_layer = next
 
 
     def updateGradient(self, head):
 
-        chain = head
+        forward_layer = head
 
         while True:
-            chain.updateGradient()
+            forward_layer.updateGradient()
 
-            next = chain.forwardChain()
+            next = forward_layer.forwardLayer()
 
             if next is None:
                 break
 
-            chain = next
+            forward_layer = next
 
 
     def predict(self, test_x):
