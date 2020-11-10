@@ -68,15 +68,6 @@ def normalize(x):
 	return x
 
 
-def load(name):
-	np_path = 'matrix_input' + '/' + name + '.npy'
-	return np.load(np_path)
-
-def save(matrix, name):
-	text_path = 'matrix_output' + '/' + name + '.txt'
-	np.savetxt(text_path, matrix.flatten())
-
-
 def print_table(table, showColumn):
 
 	template = ''

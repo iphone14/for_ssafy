@@ -4,7 +4,6 @@ from model_templates import *
 import datetime as dt
 import argparse
 
-
 def makeOneHotMap(train_y, test_y):
 
     labels = np.hstack((train_y, test_y))
@@ -122,7 +121,7 @@ def parse_arg():
     parser = argparse.ArgumentParser(prog='CNN')
     parser.add_argument('-m', dest='modelType', type=str, default='simple', choices=['simple', 'basic', 'rich'], help='sample model type (default:simple)')
     parser.add_argument('-g', dest='gradientType', type=str, default='Adam', choices=['Adam', 'SGD', 'RMSprop'], help='sample gradient type (default: RMSprop)')
-    parser.add_argument('-e', dest='epochs', type=int, default=50, help='epochs (default: 50)')
+    parser.add_argument('-e', dest='epochs', type=int, default=40, help='epochs (default: 50)')
     parser.add_argument('-d', dest='datasetType', type=str, default='sm', choices=['sm', 'md', 'lg'], help='train set size (default: sm)')
 
     return parser.parse_args()

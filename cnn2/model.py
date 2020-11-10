@@ -1,10 +1,11 @@
 from abc import *
 import numpy as np
-import operator
-from functools import reduce
 from utils import *
-from gradient import *
-from layer import *
+from layer.input import *
+from layer.convolution import *
+from layer.max_pooling import *
+from layer.flatten import *
+from layer.dense import *
 
 class Model:
     def __init__(self, layerList, log='info'):
