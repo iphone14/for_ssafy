@@ -13,8 +13,8 @@ def template_complex(gradient, input_shape, classes):
 
     layers = [
         {'type':'input', 'parameter':{'input_shape':input_shape}},
-        {'type':'convolution', 'parameter':{'filters':3, 'kernel_size':(3, 3), 'strides':(1, 1), 'padding':True, 'activation':'relu', 'gradient':gradient}},
-        {'type':'convolution', 'parameter':{'filters':3, 'kernel_size':(3, 3), 'strides':(1, 1), 'padding':True, 'activation':'relu', 'gradient':gradient}},
+        {'type':'convolution', 'parameter':{'filters':5, 'kernel_size':(3, 3), 'strides':(1, 1), 'padding':True, 'activation':'relu', 'gradient':gradient}},
+        {'type':'convolution', 'parameter':{'filters':5, 'kernel_size':(3, 3), 'strides':(1, 1), 'padding':True, 'activation':'relu', 'gradient':gradient}},
         {'type':'maxPooling', 'parameter':{'pool_size':(2, 2), 'strides':None}},
         {'type':'flatten', 'parameter':{}},
         {'type':'dense', 'parameter':{'units':256, 'activation':'relu', 'gradient':gradient}},
