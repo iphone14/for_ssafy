@@ -34,7 +34,10 @@ class Model:
             backward_layer = layerClass[type](**parameter)
 
             if self.log == 'info':
-                table = {'Layer':[backward_layer.__class__.__name__], 'Output Shape':[backward_layer.outputShape()]}
+                layerName = backward_layer.__class__.__name__
+                if 'activation' in parameter:
+                    layerName += (' (' + parameter['activation'] + ')')
+                table = {'Layer':[layerName], 'Output Shape':[backward_layer.outputShape()]}
                 print_table(table, showColumn)
                 showColumn = False
 
@@ -54,14 +57,11 @@ class Model:
 
         return head, tail
 
-
-    def train(self, x, y, epochs, batche_ratio):
+    def train(self, x, y, epochs, batches):
 
         classes = y.shape[1]
 
         showColumn = True
-
-        batches = int(len(x) * batche_ratio)
 
         for epoch in range(epochs):
 

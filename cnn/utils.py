@@ -1,4 +1,5 @@
 import numpy as np
+import random
 from PIL import Image
 import os
 from array import *
@@ -6,29 +7,17 @@ from random import shuffle
 import operator
 
 
-def getFileList(path):
+def randomLabels(classes, trainPath):
 
-	fileList = []
+	labels = []
 
-	for dirname in os.listdir(path):
+	for dirname in os.listdir(trainPath):
+		labels.append(dirname)
 
-		subPath = os.path.join(path, dirname)
-
-		for fileName in os.listdir(subPath):
-
-			if fileName.endswith(".png"):
-				fileList.append({"label":dirname, "name":fileName})
-
-	shuffle(fileList)
-
-	#fileList = [{'label': '0', 'name': '1.png'}, {'label': '1', 'name': '1.png'}, {'label': '6', 'name': '32.png'}, {'label': '8', 'name': '137.png'}, {'label': '9', 'name': '4.png'}]
-
-	return fileList
+	return random.sample(labels, k=classes)
 
 
-def extractMNIST(path):
-
-	fileList = getFileList(path)
+def loadMNISTFiles(path, lables):
 
 	colorDim = 1
 
@@ -37,27 +26,42 @@ def extractMNIST(path):
 
 	imgSize = 0
 
-	for fileInfo in fileList:
+	for label in lables:
 
-		label = fileInfo['label']
-		name = fileInfo['name']
+		subPath = path + '/' + label
 
-		filePath = path + '/' + label + '/' + name
+		for fileName in os.listdir(subPath):
 
-		img = np.array(Image.open(filePath)).astype(np.float32)
+			if fileName.endswith(".png") == False:
+				continue
 
-		imgSize = img.shape[0]
+			filePath = subPath + '/' + fileName
 
-		list = []
+			img = np.array(Image.open(filePath)).astype(np.float32)
 
-		for i in range(colorDim):
-			list = np.append(list, img.copy())
+			imgSize = img.shape[0]
 
-		X.append(list)
+			list = []
 
-		Y.append(int(label))
+			for i in range(colorDim):
+				list = np.append(list, img.copy())
+
+			X.append(list)
+
+			Y.append(label)
 
 	return np.array(X).reshape(len(X), colorDim, imgSize, imgSize), np.array(Y)
+
+
+def extractMNIST(classes, trainPath, testPath):
+
+	lables = randomLabels(classes, trainPath)
+
+	train_x, train_y = loadMNISTFiles(trainPath, lables)
+
+	test_x, test_y = loadMNISTFiles(testPath, lables)
+
+	return train_x, train_y, test_x, test_y
 
 
 def normalize(x):

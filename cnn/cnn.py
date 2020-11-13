@@ -28,19 +28,13 @@ def oneHotEncode(oneHotMap, train_y, test_y):
     return train, test
 
 
-def loadTrain(datasetType):
-    train_x, train_y = extractMNIST('./mnist/' + datasetType + '/train')
+def loadDataSet(classes):
+    train_x, train_y, test_x, test_y = extractMNIST(classes, './mnist/train', './mnist/test')
+
     train_x = normalize(train_x)
-
-    return train_x, train_y
-
-
-def loadTest(datasetType):
-    test_x, test_y = extractMNIST('./mnist/' + datasetType + '/test')
     test_x = normalize(test_x)
 
-    return test_x, test_y
-
+    return train_x, train_y, test_x, test_y
 
 def print_oneHotMap(oneHotMap):
 
@@ -75,67 +69,76 @@ def print_performance(accuracy, span):
     print_table(table, True)
 
 
-def print_arg(dataset, model, gradient, epochs, batche_ratio, total_dataset):
+def print_arg(model, gradient, classes, epochs, batches, train_dataset_len):
 
-    sizeFullText = {'sm': 'small', 'md':'medium', 'lg':'large'}
+    reduced = batches > train_dataset_len
 
-    batches_count = int(batche_ratio * total_dataset)
+    batches = train_dataset_len if reduced else batches
 
-    batches_str = str(batches_count) + ' = ' + str(total_dataset) + ' x ' + str(batche_ratio)
+    batch_str = str(batches) + (' (reduced)' if reduced else '')
 
-    arg = ['dataset', 'model', 'gradient', 'epochs', 'total dataset', 'batche ratio', 'batches']
-    values = [sizeFullText[dataset], model, gradient, epochs, total_dataset, batche_ratio, batches_str]
+    arg = ['classes', 'model', 'gradient', 'epochs', 'train dataset length', 'batches']
+    values = [classes, model, gradient, epochs, train_dataset_len, batch_str]
     table = {'Argument':arg, 'Values':values}
     print_table(table, True)
 
 
-def test(train_x, train_y, test_x, test_y, modelTemplate, epochs, batche_ratio):
+def test(train_x, train_y, test_x, test_y, modelTemplate, epochs, batches):
 
     model = Model(modelTemplate, log='info')
     model.build()
-    model.train(train_x, train_y, epochs, batche_ratio)
+    model.train(train_x, train_y, epochs, batches)
     accuracy = model.test(test_x, test_y)
 
     return accuracy
 
 
-def main(datasetType, modelType, gradientType, epochs, batche_ratio):
+def adjust_batches(batches, train_dataset_len):
+    return batches if train_dataset_len > batches else train_dataset_len
+
+
+def main(modelType, gradientType, classes, epochs, batches):
 
     start_time = dt.datetime.now()
 
-    train_x, train_y = loadTrain(datasetType)
-    test_x, test_y = loadTest(datasetType)
+    train_x, train_y, test_x, test_y = loadDataSet(classes)
 
-    print_arg(datasetType, modelType, gradientType, epochs, batche_ratio, len(train_x))
+    print_arg(modelType, gradientType, classes, epochs, batches, len(train_x))
+
+    batches = adjust_batches(batches, len(train_x))
+
     print_shapes(train_x, train_y, test_x, test_y)
 
     oneHotMap = makeOneHotMap(train_y, test_y)
 
     print_oneHotMap(oneHotMap)
 
-    modelTemplate = createModelTemplate(modelType, gradientType, train_x.shape[1:], len(oneHotMap))
-
     train_y, test_y = oneHotEncode(oneHotMap, train_y, test_y)
 
-    accuracy = test(train_x, train_y, test_x, test_y, modelTemplate, epochs, batche_ratio)
+    modelTemplate = createModelTemplate(modelType, gradientType, train_x.shape[1:], len(oneHotMap))
+
+    accuracy = test(train_x, train_y, test_x, test_y, modelTemplate, epochs, batches)
 
     print_performance(accuracy, (dt.datetime.now() - start_time))
 
 
 def parse_arg():
 
-
     parser = argparse.ArgumentParser(prog='CNN')
-    parser.add_argument('-d', dest='datasetType', type=str, default='sm', choices=['sm', 'md', 'lg'], help='train set size (default: sm)')
-    parser.add_argument('-m', dest='modelType', type=str, default='simple', choices=['simple', 'basic', 'rich'], help='sample model type (default:simple)')
+    parser.add_argument('-c', dest='classes', type=int, default='3', metavar="[1-10]", help='classes (default: 3)')
+    parser.add_argument('-m', dest='modelType', type=str, default='simple', choices=['light', 'complex'], help='sample model type (default:light)')
     parser.add_argument('-g', dest='gradientType', type=str, default='Adam', choices=['Adam', 'SGD', 'RMSprop'], help='sample gradient type (default: RMSprop)')
     parser.add_argument('-e', dest='epochs', type=int, default=50, help='epochs (default: 50)')
-    parser.add_argument('-b', dest='batche_ratio', type=float, default=0.2, metavar="[0.001-1.000]", help='batche ratio (default: 0.2)')
+    parser.add_argument('-b', dest='batches', type=int, default=60, help='batches (default: 60)')
 
     args = parser.parse_args()
 
-    if args.batche_ratio < 0.001 or args.batche_ratio > 1.00:
-        print('CNN: error: argument -b: invalid choice: ', str(args.batche_ratio), ' (choose from range [0.001-1.000]')
+    if args.classes < 1 or args.classes > 10:
+        print('CNN: error: argument -c: invalid value: ', str(args.classes), ' (value must be 1 from 10')
+        return None
+
+    if args.batches < 1:
+        print('CNN: error: argument -b: invalid value: ', str(args.batches), ' (value must be over 0')
         return None
 
     return args
@@ -145,4 +148,4 @@ if __name__ == "__main__":
     args = parse_arg()
 
     if args != None:
-        main(args.datasetType, args.modelType, args.gradientType, args.epochs, args.batche_ratio)
+        main(args.modelType, args.gradientType, args.classes, args.epochs, args.batches)
