@@ -129,7 +129,7 @@ def parse_arg():
     parser.add_argument('-m', dest='modelType', type=str, default='light', choices=['light', 'complex'], help='sample model type (default:light)')
     parser.add_argument('-g', dest='gradientType', type=str, default='Adam', choices=['Adam', 'SGD', 'RMSprop'], help='sample gradient type (default: RMSprop)')
     parser.add_argument('-e', dest='epochs', type=int, default=50, help='epochs (default: 50)')
-    parser.add_argument('-b', dest='batches', type=int, default=10, help='batches (default: 10)')
+    parser.add_argument('-b', dest='batches', type=int, help='batches (default: classes x 4)')
 
     args = parser.parse_args()
 
@@ -137,9 +137,19 @@ def parse_arg():
         print('CNN: error: argument -c: invalid value: ', str(args.classes), ' (value must be 1 from 10')
         return None
 
+    if args.batches == None:
+        args.batches = args.classes * 4
+
+
+    print(args.batches)
+
     if args.batches < 1:
         print('CNN: error: argument -b: invalid value: ', str(args.batches), ' (value must be over 0')
         return None
+
+
+
+
 
     return args
 
