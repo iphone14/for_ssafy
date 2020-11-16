@@ -10,7 +10,7 @@ class Input(ABSLayer):
     def forward(self, input):
         return input
 
-    def backward(self, error):
+    def backward(self, error, y):
         return error
 
     def outputShape(self):

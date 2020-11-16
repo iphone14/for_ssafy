@@ -77,19 +77,11 @@ class Model:
                 print_table(table, showColumn)
                 showColumn = False
 
-
     def encodeOnehot(self, label, classes):
         return np.eye(classes)[label].reshape(classes, 1)
 
-    def categoricalCrossEntropy(self, predict, label):
-        return -np.sum(label * np.log2(predict))
-
-    def forwardSoftmax(self, input):
-        input = np.exp(input)
-        return input / np.sum(input)
-
-    def backwardSoftmax(self, predict, label):
-        return predict - label
+    def categoricalCrossEntropy(self, predict_y, y):
+        return -np.sum(y * np.log2(predict_y))
 
     def batchTrain(self, head, tail, x, y, classes):
 
@@ -98,17 +90,11 @@ class Model:
         loss = 0
 
         for i in range(batches):
-            predict = self.forward(head, x[i])
+            predict_y = self.forward(head, x[i])
 
-            predict = self.forwardSoftmax(predict)
+            loss += self.categoricalCrossEntropy(predict_y, y[i])
 
-            label = y[i]
-
-            error = self.backwardSoftmax(predict, label)
-
-            loss += self.categoricalCrossEntropy(predict, label)
-
-            self.backward(tail, error)
+            self.backward(tail, predict_y, y[i])
 
         self.updateGradient(head)
 
@@ -132,16 +118,12 @@ class Model:
         return output
 
 
-    def backward(self, tail, error):
+    def backward(self, tail, error, y):
 
         backward_layer = tail
 
-        last_error = None
-
         while True:
-            error = backward_layer.backward(error)
-
-            last_error = error
+            error = backward_layer.backward(error, y)
 
             next = backward_layer.backwardLayer()
 
@@ -173,7 +155,6 @@ class Model:
         for x in test_x:
             predict = self.forward(self.head, x)
 
-            predict = self.forwardSoftmax(predict)
             prediction.append(predict)
 
         return prediction

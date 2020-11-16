@@ -19,7 +19,7 @@ def template_complex(gradient, input_shape, classes):
         {'type':'flatten', 'parameter':{}},
         {'type':'dense', 'parameter':{'units':256, 'activation':'relu', 'gradient':gradient}},
         {'type':'dense', 'parameter':{'units':64, 'activation':'relu', 'gradient':gradient}},
-        {'type':'dense', 'parameter':{'units':classes, 'activation':'linear', 'gradient':gradient}}]
+        {'type':'dense', 'parameter':{'units':classes, 'activation':'softmax', 'gradient':gradient}}]
 
     return layers
 
@@ -32,7 +32,7 @@ def template_light(gradient, input_shape, classes):
         {'type':'maxPooling', 'parameter':{'pool_size':(2, 2), 'strides':None}},
         {'type':'flatten', 'parameter':{}},
         {'type':'dense', 'parameter':{'units':64, 'activation':'relu', 'gradient':gradient}},
-        {'type':'dense', 'parameter':{'units':classes, 'activation':'linear', 'gradient':gradient}}]
+        {'type':'dense', 'parameter':{'units':classes, 'activation':'softmax', 'gradient':gradient}}]
 
     return layers
 

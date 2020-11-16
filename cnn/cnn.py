@@ -69,7 +69,7 @@ def print_performance(accuracy, span):
     print_table(table, True)
 
 
-def print_arg(model, gradient, classes, epochs, batches, train_dataset_len):
+def print_arg(model, gradient, classes, epochs, batches, train_dataset_count):
 
     reduced = batches > train_dataset_len
 
@@ -77,8 +77,8 @@ def print_arg(model, gradient, classes, epochs, batches, train_dataset_len):
 
     batch_str = str(batches) + (' (reduced)' if reduced else '')
 
-    arg = ['classes', 'model', 'gradient', 'epochs', 'train dataset length', 'batches']
-    values = [classes, model, gradient, epochs, train_dataset_len, batch_str]
+    arg = ['classes', 'model', 'gradient', 'epochs', 'train dataset count', 'batches']
+    values = [classes, model, gradient, epochs, train_dataset_count, batch_str]
     table = {'Argument':arg, 'Values':values}
     print_table(table, True)
 
@@ -128,8 +128,8 @@ def parse_arg():
     parser.add_argument('-c', dest='classes', type=int, default='3', metavar="[1-10]", help='classes (default: 3)')
     parser.add_argument('-m', dest='modelType', type=str, default='light', choices=['light', 'complex'], help='sample model type (default:light)')
     parser.add_argument('-g', dest='gradientType', type=str, default='Adam', choices=['Adam', 'SGD', 'RMSprop'], help='sample gradient type (default: RMSprop)')
-    parser.add_argument('-e', dest='epochs', type=int, default=50, help='epochs (default: 50)')
-    parser.add_argument('-b', dest='batches', type=int, help='batches (default: classes x 4)')
+    parser.add_argument('-e', dest='epochs', type=int, default=60, help='epochs (default: 60)')
+    parser.add_argument('-b', dest='batches', type=int, help='batches (default: classes x 5)')
 
     args = parser.parse_args()
 
@@ -138,18 +138,11 @@ def parse_arg():
         return None
 
     if args.batches == None:
-        args.batches = args.classes * 4
-
-
-    print(args.batches)
+        args.batches = args.classes * 5
 
     if args.batches < 1:
         print('CNN: error: argument -b: invalid value: ', str(args.batches), ' (value must be over 0')
         return None
-
-
-
-
 
     return args
 

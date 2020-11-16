@@ -24,7 +24,7 @@ class ABSLayer(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def backward(self, error):
+    def backward(self, error, y):
         pass
 
     @abstractmethod

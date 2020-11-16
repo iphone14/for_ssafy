@@ -50,15 +50,15 @@ class Convolution(ABSLayer):
         output = np.zeros(self.outputShape())
 
         for filter in range(filters):
-            y = out_y = 0
-            while (y + kernel_height) <= input_height:
-                x = out_x = 0
-                while (x + kernel_width) <= input_width:
-                    output[filter, out_y, out_x] = np.sum(self.weight[filter] * input[:, y:y + kernel_height, x:x + kernel_width]) + self.bias[filter]
-                    x += stride_x
+            input_y = out_y = 0
+            while (input_y + kernel_height) <= input_height:
+                input_x = out_x = 0
+                while (input_x + kernel_width) <= input_width:
+                    output[filter, out_y, out_x] = np.sum(self.weight[filter] * input[:, input_y:input_y + kernel_height, input_x:input_x + kernel_width]) + self.bias[filter]
+                    input_x += stride_x
                     out_x += 1
 
-                y += stride_y
+                input_y += stride_y
                 out_y += 1
 
         if self.activation == 'relu':
@@ -68,7 +68,7 @@ class Convolution(ABSLayer):
 
         return output
 
-    def backward(self, error):
+    def backward(self, error, y):
 
         if self.activation == 'relu':
             error[self.last_output <= 0] = 0
@@ -82,15 +82,15 @@ class Convolution(ABSLayer):
         grain_bias = np.zeros(self.bias.shape)
 
         for filter in range(filters):
-            y = out_y = 0
-            while (y + kernel_height) <= input_height:
-                x = out_x = 0
-                while (x + kernel_width) <= input_width:
-                    grain_weight[filter] += error[filter, out_y, out_x] * self.last_input[:, y:y + kernel_height, x:x + kernel_width]
-                    output[:, y:y + kernel_height, x:x + kernel_width] += error[filter, out_y, out_x] * self.weight[filter]
-                    x += stride_x
+            input_y = out_y = 0
+            while (input_y + kernel_height) <= input_height:
+                input_x = out_x = 0
+                while (input_x + kernel_width) <= input_width:
+                    grain_weight[filter] += error[filter, out_y, out_x] * self.last_input[:, input_y:input_y + kernel_height, input_x:input_x + kernel_width]
+                    output[:, input_y:input_y + kernel_height, input_x:input_x + kernel_width] += error[filter, out_y, out_x] * self.weight[filter]
+                    input_x += stride_x
                     out_x += 1
-                y += stride_y
+                input_y += stride_y
                 out_y += 1
 
             grain_bias[filter] = np.sum(error[filter])

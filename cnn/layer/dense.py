@@ -30,16 +30,25 @@ class Dense(ABSLayer):
 
         if self.activation == 'relu':
             output[output<=0] = 0
+        elif self.activation == 'softmax':
+            output = self.softmax(output)
         #elif self.activation == 'linear':
 
         self.last_output = output
 
         return output
 
-    def backward(self, error):
+
+    def softmax(self, output):
+        output = np.exp(output)
+        return output / np.sum(output)
+
+    def backward(self, error, y):
 
         if self.activation == 'relu':
             error[self.last_output <= 0] = 0
+        elif self.activation == 'softmax':
+            error = (error - y)
 
         grain_weight = error.dot(self.last_input.T)
         grain_bias = np.sum(error, axis = 1).reshape(self.bias.shape)

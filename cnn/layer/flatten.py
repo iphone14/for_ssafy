@@ -12,7 +12,7 @@ class Flatten(ABSLayer):
     def forward(self, input):
         return input.reshape((-1, 1))
 
-    def backward(self, error):
+    def backward(self, error, y):
         return error.reshape(self.input_shape)
 
     def outputShape(self):
