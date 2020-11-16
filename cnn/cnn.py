@@ -71,9 +71,9 @@ def print_performance(accuracy, span):
 
 def print_arg(model, gradient, classes, epochs, batches, train_dataset_count):
 
-    reduced = batches > train_dataset_len
+    reduced = batches > train_dataset_count
 
-    batches = train_dataset_len if reduced else batches
+    batches = train_dataset_count if reduced else batches
 
     batch_str = str(batches) + (' (reduced)' if reduced else '')
 
