@@ -57,8 +57,6 @@ def extractMNIST(classes, trainPath, testPath):
 
 	lables = randomLabels(classes, trainPath)
 
-	print(lables)
-
 	train_x, train_y = loadMNISTFiles(trainPath, lables)
 
 	test_x, test_y = loadMNISTFiles(testPath, lables)
