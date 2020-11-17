@@ -1,6 +1,6 @@
+from PIL import Image
 import numpy as np
 import random
-from PIL import Image
 import os
 from array import *
 from random import shuffle
@@ -56,6 +56,8 @@ def loadMNISTFiles(path, lables):
 def extractMNIST(classes, trainPath, testPath):
 
 	lables = randomLabels(classes, trainPath)
+
+	print(lables)
 
 	train_x, train_y = loadMNISTFiles(trainPath, lables)
 

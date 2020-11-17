@@ -38,7 +38,7 @@ def saveFile(image):
 
     global step
 
-    folder = 'process'
+    folder = 'images'
 
     if os.path.isdir(folder) is False:
         os.mkdir(folder)
